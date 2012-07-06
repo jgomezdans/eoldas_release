@@ -1,0 +1,302 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Application to MODIS reflectance data &mdash; EOLDAS Users&#39; Guide 2012.06 documentation</title>
+    
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/print.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '2012.06',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/theme_extras.js"></script>
+    <link rel="top" title="EOLDAS Users&#39; Guide 2012.06 documentation" href="index.html" /> 
+  </head>
+  <body>
+      <div class="header">
+        <a href="index.html">
+          <img class="logo" src="_static/eoldas_logos.png" alt="Logo"/>
+        </a>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        <a class="uplink" href="index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="application-to-modis-reflectance-data">
+<h1>Application to MODIS reflectance data<a class="headerlink" href="#application-to-modis-reflectance-data" title="Permalink to this headline">¶</a></h1>
+<p>We can now apply the concepts demonstrated above to real EO data from the MODIS sensors.</p>
+<p>This is actually quite trivial to achieve as it involves the same basic
+configuration file as previously. This time, we will access it from <tt class="docutils literal"><span class="pre">eoldas_run.py</span></tt>.</p>
+<p>An example data file then is <tt class="docutils literal"><span class="pre">data/modis_botswana.dat</span></tt> which is MODIS reflectance data for a site in Botswana. The format of this file is
+&#8216;BRDF&#8217;, which looks like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">BRDF</span> <span class="mi">67</span> <span class="mi">7</span> <span class="mi">645</span> <span class="mf">858.5</span> <span class="mi">469</span> <span class="mi">555</span> <span class="mi">1240</span> <span class="mi">1640</span> <span class="mi">2130</span>  <span class="mf">0.003</span> <span class="mf">0.004</span> <span class="mf">0.004</span> <span class="mf">0.015</span> <span class="mf">0.013</span> <span class="mf">0.01</span> <span class="mf">0.006</span>
+<span class="mi">181</span> <span class="mi">1</span> <span class="mf">62.830002</span> <span class="o">-</span><span class="mf">83.040001</span> <span class="mf">37.910000</span> <span class="mf">23.219999</span> <span class="mf">0.032900</span> <span class="mf">0.068600</span> <span class="mf">0.018000</span> <span class="mf">0.028400</span> <span class="mf">0.098100</span> <span class="mf">0.097600</span> <span class="mf">0.081900</span> 
+<span class="mi">182</span> <span class="mi">1</span> <span class="mf">33.980000</span> <span class="mf">99.540001</span> <span class="mf">44.970001</span> <span class="mf">39.290001</span> <span class="mf">0.050500</span> <span class="mf">0.091800</span> <span class="mf">0.030000</span> <span class="mf">0.045300</span> <span class="mf">0.123200</span> <span class="mf">0.137100</span> <span class="mf">0.124800</span> 
+<span class="mi">184</span> <span class="mi">1</span> <span class="mf">51.660000</span> <span class="mf">99.300003</span> <span class="mf">46.889999</span> <span class="mf">42.349998</span> <span class="mf">0.056200</span> <span class="mf">0.106000</span> <span class="mf">0.029500</span> <span class="mf">0.053800</span> <span class="mf">0.151600</span> <span class="mf">0.154600</span> <span class="mf">0.141400</span> 
+<span class="mi">185</span> <span class="mi">1</span> <span class="mf">32.880001</span> <span class="o">-</span><span class="mf">81.900002</span> <span class="mf">40.540001</span> <span class="mf">31.510000</span> <span class="mf">0.039200</span> <span class="mf">0.069600</span> <span class="mf">0.022900</span> <span class="mf">0.034400</span> <span class="mf">0.089800</span> <span class="mf">0.102500</span> <span class="mf">0.092800</span> 
+<span class="mi">186</span> <span class="mi">1</span> <span class="mf">63.049999</span> <span class="mf">100.470001</span> <span class="mf">48.910000</span> <span class="mf">45.169998</span> <span class="mf">0.058200</span> <span class="mf">0.138600</span> <span class="mf">0.038900</span> <span class="mf">0.055200</span> <span class="mf">0.184600</span> <span class="mf">0.183800</span> <span class="mf">0.143100</span> 
+<span class="mi">187</span> <span class="mi">1</span> <span class="mf">6.430000</span> <span class="o">-</span><span class="mf">79.459999</span> <span class="mf">42.090000</span> <span class="mf">35.259998</span> <span class="mf">0.043700</span> <span class="mf">0.074600</span> <span class="mf">0.026400</span> <span class="mf">0.038700</span> <span class="mf">0.103100</span> <span class="mf">0.118400</span> <span class="mf">0.103600</span> 
+<span class="mi">189</span> <span class="mi">1</span> <span class="mf">22.389999</span> <span class="mf">97.720001</span> <span class="mf">43.790001</span> <span class="mf">38.750000</span> <span class="mf">0.044500</span> <span class="mf">0.088400</span> <span class="mf">0.027100</span> <span class="mf">0.040200</span> <span class="mf">0.129500</span> <span class="mf">0.135800</span> <span class="mf">0.127600</span> 
+<span class="mi">190</span> <span class="mi">1</span> <span class="mf">57.400002</span> <span class="o">-</span><span class="mf">82.720001</span> <span class="mf">38.029999</span> <span class="mf">26.480000</span> <span class="mf">0.050700</span> <span class="mf">0.087700</span> <span class="mf">0.024600</span> <span class="mf">0.045200</span> <span class="mf">0.119900</span> <span class="mf">0.118000</span> <span class="mf">0.098100</span> 
+<span class="mi">191</span> <span class="mi">1</span> <span class="mf">44.040001</span> <span class="mf">99.419998</span> <span class="mf">45.619999</span> <span class="mf">41.990002</span> <span class="mf">0.062800</span> <span class="mf">0.107800</span> <span class="mf">0.035600</span> <span class="mf">0.057100</span> <span class="mf">0.141600</span> <span class="mf">0.154800</span> <span class="mf">0.137600</span> 
+<span class="mi">192</span> <span class="mi">1</span> <span class="mf">42.689999</span> <span class="o">-</span><span class="mf">82.820000</span> <span class="mf">39.290001</span> <span class="mf">30.719999</span> <span class="mf">0.041300</span> <span class="mf">0.078800</span> <span class="mf">0.022700</span> <span class="mf">0.036600</span> <span class="mf">0.106400</span> <span class="mf">0.109000</span> <span class="mf">0.096100</span> 
+<span class="mi">193</span> <span class="mi">1</span> <span class="mf">58.139999</span> <span class="mf">99.800003</span> <span class="mf">47.560001</span> <span class="mf">45.000000</span> <span class="mf">0.063500</span> <span class="mf">0.124200</span> <span class="mf">0.034900</span> <span class="mf">0.060800</span> <span class="mf">0.169700</span> <span class="mf">0.170900</span> <span class="mf">0.143400</span> 
+<span class="mi">194</span> <span class="mi">1</span> <span class="mf">20.129999</span> <span class="o">-</span><span class="mf">82.099998</span> <span class="mf">40.730000</span> <span class="mf">34.689999</span> <span class="mf">0.038600</span> <span class="mf">0.073200</span> <span class="mf">0.024000</span> <span class="mf">0.035100</span> <span class="mf">0.106900</span> <span class="mf">0.111700</span> <span class="mf">0.105200</span> 
+<span class="mi">196</span> <span class="mi">1</span> <span class="mf">8.940000</span> <span class="mf">96.330002</span> <span class="mf">42.330002</span> <span class="mf">38.389999</span> <span class="mf">0.052200</span> <span class="mf">0.090000</span> <span class="mf">0.030300</span> <span class="mf">0.047200</span> <span class="mf">0.118400</span> <span class="mf">0.131700</span> <span class="mf">0.123100</span> 
+<span class="mi">197</span> <span class="mi">1</span> <span class="mf">62.480000</span> <span class="o">-</span><span class="mf">83.120003</span> <span class="mf">36.610001</span> <span class="mf">25.559999</span> <span class="mf">0.053800</span> <span class="mf">0.092700</span> <span class="mf">0.025000</span> <span class="mf">0.049200</span> <span class="mf">0.118100</span> <span class="mf">0.120200</span> <span class="mf">0.093200</span> 
+<span class="mi">198</span> <span class="mi">1</span> <span class="mf">34.730000</span> <span class="mf">99.230003</span> <span class="mf">44.060001</span> <span class="mf">41.840000</span> <span class="mf">0.054500</span> <span class="mf">0.103800</span> <span class="mf">0.030300</span> <span class="mf">0.051400</span> <span class="mf">0.144800</span> <span class="mf">0.147200</span> <span class="mf">0.133300</span> 
+<span class="mi">199</span> <span class="mi">1</span> <span class="mf">50.549999</span> <span class="o">-</span><span class="mf">82.849998</span> <span class="mf">37.750000</span> <span class="mf">30.030001</span> <span class="mf">0.044100</span> <span class="mf">0.082200</span> <span class="mf">0.025500</span> <span class="mf">0.041300</span> <span class="mf">0.104800</span> <span class="mf">0.114500</span> <span class="mf">0.093900</span> 
+<span class="mi">200</span> <span class="mi">1</span> <span class="mf">52.070000</span> <span class="mf">100.010002</span> <span class="mf">45.910000</span> <span class="mf">45.029999</span> <span class="mf">0.074300</span> <span class="mf">0.132000</span> <span class="mf">0.037400</span> <span class="mf">0.069800</span> <span class="mf">0.174200</span> <span class="mf">0.169700</span> <span class="mf">0.143300</span> 
+<span class="mi">201</span> <span class="mi">1</span> <span class="mf">32.130001</span> <span class="o">-</span><span class="mf">82.889999</span> <span class="mf">39.080002</span> <span class="mf">34.240002</span> <span class="mf">0.041500</span> <span class="mf">0.077000</span> <span class="mf">0.026200</span> <span class="mf">0.038900</span> <span class="mf">0.071200</span> <span class="mf">0.108400</span> <span class="mf">0.096300</span> 
+<span class="mi">202</span> <span class="mi">1</span> <span class="mf">63.400002</span> <span class="mf">100.080002</span> <span class="mf">47.880001</span> <span class="mf">48.009998</span> <span class="mf">0.082600</span> <span class="mf">0.155400</span> <span class="mf">0.043600</span> <span class="mf">0.073800</span> <span class="mf">0.191000</span> <span class="mf">0.187000</span> <span class="mf">0.137200</span> 
+<span class="mi">203</span> <span class="mi">1</span> <span class="mf">5.270000</span> <span class="o">-</span><span class="mf">76.970001</span> <span class="mf">40.590000</span> <span class="mf">38.189999</span> <span class="mf">0.053000</span> <span class="mf">0.092500</span> <span class="mf">0.026800</span> <span class="mf">0.047500</span> <span class="mf">0.122900</span> <span class="mf">0.121400</span> <span class="mf">0.109300</span> 
+<span class="mi">205</span> <span class="mi">1</span> <span class="mf">23.219999</span> <span class="mf">97.779999</span> <span class="mf">42.220001</span> <span class="mf">41.840000</span> <span class="mf">0.067000</span> <span class="mf">0.113900</span> <span class="mf">0.034600</span> <span class="mf">0.060000</span> <span class="mf">0.143100</span> <span class="mf">0.148500</span> <span class="mf">0.131800</span> 
+<span class="mi">206</span> <span class="mi">1</span> <span class="mf">56.959999</span> <span class="o">-</span><span class="mf">83.139999</span> <span class="mf">35.910000</span> <span class="mf">29.340000</span> <span class="mf">0.065800</span> <span class="mf">0.102000</span> <span class="mf">0.033800</span> <span class="mf">0.062000</span> <span class="mf">0.117800</span> <span class="mf">0.113800</span> <span class="mf">0.087400</span> 
+</pre></div>
+</div>
+<p>The first line is a header, as with the previous &#8216;PARAMETERS&#8217; format we saw.
+The first word on the header must be <tt class="docutils literal"><span class="pre">BRDF</span></tt> (a # can be included for compatitbilty with
+some other formats).</p>
+<p>The second item on the header line is the number of samples in the file (92 here). The third item is the
+number of wavebands represented (7 here) then this is followed by wavelengths, wavebands, or waveband identifiers.</p>
+<p>If a single float number is given, it is assumed to represent a narrow waveband centred around
+that wavelength. Wavelength is assumed to be in nm. If it is two float numbers connected by a dash (e.g. 45-550)
+then it is taken to be a tophat function representation of a waveband, where the two number represent
+the minimum and maximum wavelength respectively.
+If some other code is found (e.g. <tt class="docutils literal"><span class="pre">B2</span></tt>), it is assumed to be a tag associated with a particular waveband.
+In this case, any spectral libraries loaded in the configuration files are searched to see if they contain
+a definition of this waveband. If nothing is found and it cannot be interpreted as a number, it is assigned an arbitrary wavelength (index starting from 0) and should not be interpreted as a wavelength identifier.</p>
+<p>The 7 columns following the wavebands specify the standard deviation in the reflectance data.
+All subsequent lines contain reflectance, as a function of &#8216;locational&#8217;, &#8216;control&#8217; and spectral information. The first column
+here defines location (time), columns 2 to 6 are &#8216;control&#8217; variables: things the observation waries as a function of that are not
+spectral or locational. In this case, they are (all angles are in degrees):</p>
+<p># a data mask (1 for good),
+# view zenith angle,
+# view azimuth angle,
+# solar zenith angle,
+# solar azimuth angle.</p>
+<p>The final 7 columns give the reflectance in the 7 wavebands for each location defined.</p>
+<p>The data span days of year 181 to 272 inclusive. There is a lot of day to day variation in the data, but a clear
+underlying trend in the Near infrared. We will set ourselves the task of trying to use eoldas to filter the dataset
+so that the trend becomes more apparent. We will also try to extrapolate from the sample days to the whole year (which is clearly
+quite a challenge, but instructive for understanding uncertainty).</p>
+<p>We will apply the same data assimilation components as previously, i.e. an Identity operator for the NIR reflectance
+(in other words, we take the reflectance as a prior estimate of what we wish to estimate) and a regularisation filter
+implemented as a constraint on first order derivatives at lag one day. We will suppose that we know the uncertainty in this
+model (the temporal constraint) to be expressed as a standard deviation of .002 (1/500), i.e. the root mean squared deviation from
+one day to the next is expected to be around .002. An examination of the dataset will show that the NIR reflectance roughly
+increases from around 0.1 to 0.2 over about 100 days, so we could use a gamma value of 1000. However, we don&#8217;t want to impose that constraint too strongly, so we will instead use a gamma of 500. We are not trying to fit a trendline
+here, just to smooth the dataset so that we can detect the underlying behaviour. The result should however not be very sensitive to this guess and can always be explored using approaches such as cross validation.</p>
+<p>We have a configuration file set up in <tt class="docutils literal"><span class="pre">config_files/Identity2.conf</span></tt>. This provides a full
+description of the problem we wish to solve, which is to reduce noise in the NIR observation series.</p>
+<div class="highlight-python"><pre># An EOLDAS configuration file for
+# a simple Identity operator and a regulariser
+
+[parameter]
+location = ['time']
+limits = [[1,365,1]]
+help_limits="define the limits for the required locational information"
+names = "gamma_time 858.5".split()
+solve = 0,1
+datatypes = x
+
+[parameter.result]
+filename = output/Identity/MODIS_botswana.params
+format = 'PARAMETERS'
+help_filename='Set the output state filename'
+
+[parameter.x]
+datatype = x
+names = $parameter.names
+default = 500,0.1
+state= data/modis_botswana.dat
+help_default="Set the default values of the states"
+apply_grid = True
+sd = [1.]*len($parameter.names)
+bounds =  [[0.000001,1000000],[0,1]]
+
+[general]
+doplot=True
+help_do_plot='do plotting'
+calc_posterior_unc=False
+
+[operator]
+modelt.name=DModel_Operator
+modelt.datatypes = x
+obs.name=Operator
+obs.datatypes = x,y
+
+[operator.modelt.x]
+names = $parameter.names
+sd = [1.0]*len($operator.modelt.x.names)
+datatype = x
+
+[operator.modelt.rt_model]
+model_order=1
+help_model_order='The differential model order'
+wraparound=periodic,365
+#wraparound=None
+
+[operator.obs.x]
+names = $parameter.names[1:]
+sd = [1.0]*len($operator.obs.x.names)
+help_sd='Set the observation sd'
+datatype = x
+
+[operator.obs.y]
+control = [mask,vza,vaa,sza,saa]
+names = $parameter.names[1:]
+sd = [0.015]*len($operator.obs.x.names)
+#help_sd="set the sd for the observations"
+datatype = y
+state = data/modis_botswana.dat
+help_state = "Set the y state vector"
+
+[operator.obs.y.result]
+filename = output/Identity/Botswana_fwd.params
+format = 'PARAMETERS'
+help_filename = 'Set the fwd modelling result filename'
+
+
+
+</pre>
+</div>
+<p>In this, we can see the required location field defined in the <tt class="docutils literal"><span class="pre">[parameters]</span></tt> section (i.e. <tt class="docutils literal"><span class="pre">parameters.location=[[1,365,1]]</span></tt>).
+The control variables are associated with  the observation operator, here given as <tt class="docutils literal"><span class="pre">[mask,vza,vaa,sza,saa]</span></tt>.</p>
+<p>To run eoldas with this configuration then all we need do is type:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">eoldas_run</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">conf</span><span class="o">=</span><span class="n">config_files</span><span class="o">/</span><span class="n">eoldas_config</span><span class="o">.</span><span class="n">conf</span> \
+  <span class="o">--</span><span class="n">conf</span><span class="o">=</span><span class="n">config_files</span><span class="o">/</span><span class="n">Identity2</span><span class="o">.</span><span class="n">conf</span> <span class="o">--</span><span class="n">calc_posterior_unc</span>
+</pre></div>
+</div>
+<p>This writes the files:</p>
+<p><tt class="docutils literal"><span class="pre">output/Identity/MODIS_botswana.params</span></tt>: state estimation (smoothed reflectance)</p>
+<div class="highlight-python"><pre> 181.000000    1.000000  500.000000    0.095014    0.000000    0.005513
+ 182.000000    1.000000  500.000000    0.095247    0.000000    0.005255
+ 183.000000    1.000000  500.000000    0.095541    0.000000    0.005063
+ 184.000000    1.000000  500.000000    0.095835    0.000000    0.004840
+ 185.000000    1.000000  500.000000    0.095949    0.000000    0.004669
+ 186.000000    1.000000  500.000000    0.096530    0.000000    0.004541
+ 187.000000    1.000000  500.000000    0.096364    0.000000    0.004451
+ 188.000000    1.000000  500.000000    0.096585    0.000000    0.004396
+ 189.000000    1.000000  500.000000    0.096806    0.000000    0.004293
+ 190.000000    1.000000  500.000000    0.097176    0.000000    0.004216
+ 191.000000    1.000000  500.000000    0.097714    0.000000    0.004161
+</pre>
+</div>
+<p><tt class="docutils literal"><span class="pre">output/Identity/Botswana_fwd.params</span></tt>: forward modelling of y</p>
+<div class="highlight-python"><pre>#PARAMETERS time mask,vza,vaa,sza,saa 858.5 sd-858.5
+ 181.000000    0.000000    0.095014    0.000000
+ 182.000000    0.000000    0.095247    0.000000
+ 184.000000    0.000000    0.095835    0.000000
+ 185.000000    0.000000    0.095949    0.000000
+ 186.000000    0.000000    0.096530    0.000000
+ 187.000000    0.000000    0.096364    0.000000
+ 189.000000    0.000000    0.096806    0.000000
+ 190.000000    0.000000    0.097176    0.000000
+ 191.000000    0.000000    0.097714    0.000000
+</pre>
+</div>
+<p>as well as the orignal data in <tt class="docutils literal"><span class="pre">output/Identity/Botswana_fwd.params_orig</span></tt></p>
+<div class="highlight-python"><pre>#PARAMETERS time mask,vza,vaa,sza,saa 858.5 sd-858.5
+ 181.000000    0.000000    0.068600    0.015000
+ 182.000000    0.000000    0.091800    0.015000
+ 184.000000    0.000000    0.106000    0.015000
+ 185.000000    0.000000    0.069600    0.015000
+ 186.000000    0.000000    0.138600    0.015000
+ 187.000000    0.000000    0.074600    0.015000
+ 189.000000    0.000000    0.088400    0.015000
+ 190.000000    0.000000    0.087700    0.015000
+ 191.000000    0.000000    0.107800    0.015000
+</pre>
+</div>
+<p>with appropriate graphics for the state:</p>
+<img alt="_images/MODIS_botswana.params.plot.x.png" src="_images/MODIS_botswana.params.plot.x.png" />
+<p>and the y data:</p>
+<img alt="_images/Botswana_fwd.params.plot.y2.png" src="_images/Botswana_fwd.params.plot.y2.png" />
+<img alt="_images/Botswana_fwd.params.plot.x.png" src="_images/Botswana_fwd.params.plot.x.png" />
+<p>The resultant state data are quite instructive: where we have observations, the uncertainty
+is reduced from 0.015 to around 0.004 (the actual degree of noise reduction
+depends on the value of gamma used). Where there are no data, the uncertainty
+grows to around 0.017. It is slightly reduced at the year start/end because of the wrparound condition used here.</p>
+<p>In this case, we have used a first order differential constraint with a periodic boundary condition. These
+are quite important in this case: we only have observations in a limited time window, so using a periodic
+boundary condition is one way to place some form of constraint at what happens when we have no data. The
+first order differential model will in essence perform a linear interpolation where there are no data, which is
+probably appropriate for this case. You can try changing the model order to see what happens. Run e.g.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">eoldas_run</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">conf</span><span class="o">=</span><span class="n">config_files</span><span class="o">/</span><span class="n">eoldas_config</span><span class="o">.</span><span class="n">conf</span> \
+  <span class="o">--</span><span class="n">conf</span><span class="o">=</span><span class="n">config_files</span><span class="o">/</span><span class="n">Identity2</span><span class="o">.</span><span class="n">conf</span> <span class="o">--</span><span class="n">calc_posterior_unc</span> \
+  <span class="o">--</span><span class="n">operator</span><span class="o">.</span><span class="n">modelt</span><span class="o">.</span><span class="n">rt_model</span><span class="o">.</span><span class="n">model_order</span><span class="o">=</span><span class="mi">2</span> \
+  <span class="o">--</span><span class="n">parameter</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">default</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span><span class="mf">0.1</span> \
+  <span class="o">--</span><span class="n">operator</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">filename</span><span class="o">=</span><span class="n">output</span><span class="o">/</span><span class="n">Identity</span><span class="o">/</span><span class="n">Botswana_fwd</span><span class="o">.</span><span class="n">params2</span> \
+  <span class="o">--</span><span class="n">parameter</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">filename</span><span class="o">=</span><span class="n">output</span><span class="o">/</span><span class="n">Identity</span><span class="o">/</span><span class="n">MODIS_botswana</span><span class="o">.</span><span class="n">params2</span>
+</pre></div>
+</div>
+<p>and have a look at <tt class="docutils literal"><span class="pre">output/Identity/MODIS_botswana.params2.plot.x.png</span></tt>:</p>
+<img alt="_images/MODIS_botswana.params2.plot.x.png" src="_images/MODIS_botswana.params2.plot.x.png" />
+<p>The assumed behaviour is quite different to the first order differential constraint outside of the observations. With a high value of gamma, the result is essentially a straight line where there are observations.
+The influence of the wraparound condition is also clear here.</p>
+<p>If we used a lower gamma, we would see some features of using a second order model:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">eoldas_run</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">conf</span><span class="o">=</span><span class="n">config_files</span><span class="o">/</span><span class="n">eoldas_config</span><span class="o">.</span><span class="n">conf</span> \
+  <span class="o">--</span><span class="n">conf</span><span class="o">=</span><span class="n">config_files</span><span class="o">/</span><span class="n">Identity2</span><span class="o">.</span><span class="n">conf</span> <span class="o">--</span><span class="n">calc_posterior_unc</span> \
+  <span class="o">--</span><span class="n">operator</span><span class="o">.</span><span class="n">modelt</span><span class="o">.</span><span class="n">rt_model</span><span class="o">.</span><span class="n">model_order</span><span class="o">=</span><span class="mi">2</span> \
+  <span class="o">--</span><span class="n">parameter</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">default</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span><span class="mf">0.1</span>  \
+  <span class="o">--</span><span class="n">operator</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">filename</span><span class="o">=</span><span class="n">output</span><span class="o">/</span><span class="n">Identity</span><span class="o">/</span><span class="n">Botswana_fwd</span><span class="o">.</span><span class="n">params3</span>  \
+  <span class="o">--</span><span class="n">parameter</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">filename</span><span class="o">=</span><span class="n">output</span><span class="o">/</span><span class="n">Identity</span><span class="o">/</span><span class="n">MODIS_botswana</span><span class="o">.</span><span class="n">params3</span>
+</pre></div>
+</div>
+<img alt="_images/MODIS_botswana.params3.plot.x.png" src="_images/MODIS_botswana.params3.plot.x.png" />
+<p>Where there are observations, the second order difference constraint would have high frequency oscillations. This can be a positive feature or an annoyance: it all depends on how you expect the function to behave. It is
+not an arbitrary choice: the user has imposed a particular expectation of behaviour here through the model. There clearly needs to be some evidence for choosing one form of model over another, although that is not always straightforward.</p>
+<p>One other interesting feature of this result is that the mean estimate is bounded (0.0,1.0) which is reasonable for reflectance data (theoretically, BRF can go above 1, but this is rarely observed). This means that the mean value (the red line) is forced to stay above 0 (days 100 to 150) even though the apparent trend from the observations might otherwise make it go below zero. This condition is imposed in the configuration by the line:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">bounds</span> <span class="o">=</span>  <span class="p">[[</span><span class="mf">0.000001</span><span class="p">,</span><span class="mi">1000000</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]]</span>
+</pre></div>
+</div>
+<p>One further thing to note about this result is that when the uncertainty is so large (as is the case here when we are extrapolating) that the confidence interval spans more than the entire data range (0,1) the mean and standard deviation described in the Gaussian statistics are a little meaningless or at least should be interpreted with caution. It might in this case be better to describe the data (in the extrapolated region) as simply being somewhere between the physical limits.</p>
+<p>A final comment is that actually, a large amount of the departure of the signal from our smooth trajectory, the high frequency variation that we have treated as noise here, can most likely be described by considering the physics os scattering by the surface (there are, on the whole, BRDF effects). We will return to this later.</p>
+<p>As well as raising a few issues with regard to model selection, we have demonstrated further use of the eoldas command line for quickly changing some terms in an experiment.
+However, it is all very well in showing that eoldas can ingest satellite data and
+apply constraints to provide an estimate of state variables, but the
+state variables here (reflectance) do not directly help us monitor the
+properties of the land surface or link to process models.</p>
+<p>To do that using EO data, we generally need more complex obeseravtion operators. These are dealt with in the next section.</p>
+</div>
+
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        <a class="uplink" href="index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, P Lewis and J Gomez-Dans.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

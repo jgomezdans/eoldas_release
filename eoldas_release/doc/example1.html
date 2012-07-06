@@ -1,0 +1,1003 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>A simple observation operator example, running in eoldas &mdash; EOLDAS Users&#39; Guide 2012.06 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/print.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '2012.06',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/theme_extras.js"></script>
+    <link rel="top" title="EOLDAS Users&#39; Guide 2012.06 documentation" href="../../index.html" /> 
+  </head>
+  <body>
+      <div class="header">
+        <a href="../../index.html">
+          <img class="logo" src="../../_static/eoldas_logos.png" alt="Logo"/>
+        </a>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        <a class="uplink" href="../../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="a-simple-observation-operator-example-running-in-eoldas">
+<h1>A simple observation operator example, running in eoldas<a class="headerlink" href="#a-simple-observation-operator-example-running-in-eoldas" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="purpose-of-this-section">
+<h2>Purpose of this section<a class="headerlink" href="#purpose-of-this-section" title="Permalink to this headline">¶</a></h2>
+<p>This section of the user guide will take a simple example of combining two
+cost functions in a variational DA sense: an Identity (or Prior)
+operator and a smoothness (derivative) constraint. The examples used here
+are of filtering noisy time series of NDVI data.</p>
+<p>As well as learning about these concepts if you are unfamiliar with them,
+this section will also take you through some examples of running the eoldas
+to solve this sort of problem. Towards the end of the section, we delve into
+writing some python code to make use of eoldas, and also mention other ways of
+interacting with it.</p>
+<p>We learn that at the heart of eoldas is one or more configuration files
+that allow us to solve problems without the need for any code writing (though
+you can if you want to!).</p>
+<div class="section" id="introducing-the-observation-operator-concept">
+<h3>Introducing the observation operator concept<a class="headerlink" href="#introducing-the-observation-operator-concept" title="Permalink to this headline">¶</a></h3>
+<p>In the previous sections, we have assumed that the state of the land surface can
+be observed directly, and that these observations are only limited by noise in
+their
+acquisition. In general, the state of the surface and the observations will be
+different entities. For example, the state of the surface may include parameters
+such as leaf area index, chlorophyll concentration or soil moisture, whereas the
+observations may be of directional surface reflectance, top of atmosphere
+radiance
+or microwave temperatures. The link between these magnitudes is the observation
+operator, which maps the land surface parameters into quantities that are
+measured
+by a sensor. Many types of observation operator are available: from the
+statistical
+to the physics based. The simplest case, however, is the identity operator. In
+fact, we have already used it, as we have assumed that the observations are
+just direct measurements of the state vector.</p>
+</div>
+<div class="section" id="a-simple-data-assimilation-example-using-an-identity-observation-operator">
+<h3>A simple data assimilation example using an identity observation operator<a class="headerlink" href="#a-simple-data-assimilation-example-using-an-identity-observation-operator" title="Permalink to this headline">¶</a></h3>
+<p>The simplest observation operator is the identity observation operator, where
+the observations are identical to the state vector components. We can see the
+use of this operator as a way of optimally smoothing univariate timeseries, for
+example NDVI. Additionally, the use of a DA system allows to interpolate where
+data points are not available. The following demonstrates how the EOLDAS
+prototype can be used for this task, and also allows us to explore the use of
+the weak assimilation paradigm conveniently.</p>
+<p>The main way to run EOLDAS is via one or more configuration files. This is
+partly to make sure that a record exists of a particular experimental setup
+and partly to allow flexible running of the system without the need for further coiding by the
+user (unless he/she wants to add new classes or methods).</p>
+<p>Here is the start of the <a class="reference external" href="config_files/Identity.conf">configuration file</a> that we are
+going to use:</p>
+<div class="highlight-python"><pre># An EOLDAS confioguration file for
+# a simple Identity operator and a regulariser
+
+[parameter]
+location = ['time']
+limits = [[1,365,1]]
+names = gamma_time,NDVI
+solve = 0,1
+datatypes = x
+
+[parameter.result]
+filename = output/Identity/NDVI_Identity.params
+format = 'PARAMETERS'
+help_filename='Set the output state filename'
+
+[parameter.x]
+datatype = x
+names = $parameter.names
+default = 200,0
+help_default="Set the default values of the states"
+apply_grid = True
+sd = [1.]*len($parameter.names)
+bounds =  [[0.000001,1000000],[-1,1]]
+</pre>
+</div>
+<p>This sets up the section <tt class="docutils literal"><span class="pre">[parameter]</span></tt>, which described the state variables within EOLDAS.</p>
+<p>The section must contain fields describing the
+locational information of the data to be used as well as the names of the
+state variables we will consider. In this case, we have two state variables <tt class="docutils literal"><span class="pre">gamma_time</span></tt>
+and <tt class="docutils literal"><span class="pre">NDVI</span></tt> that we wish to estimate over the (time) range 1 to 365 (inclusive) in steps of 1 (day).</p>
+<p>The subsection parameter.solve gives a list of codes indicating whether we wish to solve for
+each parameter or not.</p>
+<p>A code of 0 tells the EOLDAS not to solve, i.e. just to use the data that are read in
+or any other default values.</p>
+<p>A code of 1 tells EOLDAS to solve for that state variable at all locations (times here).</p>
+<p>A code of 2 tells EOLDAS to solve for the state variable, but to maintain a single value over all
+locations.</p>
+<p>The section <tt class="docutils literal"><span class="pre">parameter.result</span></tt> gives information on any output file name and format for the
+state.</p>
+<p>Finally in this section, the field <tt class="docutils literal"><span class="pre">parameter.x</span></tt> sets up data and conditions for the state vector
+<tt class="docutils literal"><span class="pre">x</span></tt>. Remember that it is this state vector <tt class="docutils literal"><span class="pre">x</span></tt> that we will solve for in the EOLDAS.
+Here, we specify that it is of datatype <tt class="docutils literal"><span class="pre">x</span></tt> (i.e. the <tt class="docutils literal"><span class="pre">x</span></tt> state vector), that it has
+the same names as we set up in <tt class="docutils literal"><span class="pre">parameter.names</span></tt>, that default values to be assigned are 25 and 0
+for the two variables respectively. If any data are read in, these override the default values,
+but in this case, we simply start with the defaults.</p>
+<p>The text <tt class="docutils literal"><span class="pre">help_default</span></tt> allows the field <tt class="docutils literal"><span class="pre">parameter.x.default</span></tt> to be set from the command line with the
+option <tt class="docutils literal"><span class="pre">--parameter.x.default=a,b</span></tt>.</p>
+<p>The flag <tt class="docutils literal"><span class="pre">apply_grid</span></tt>, which is the default, tells the EOLDAS to produce the state vector on a grid over the
+bounds defined in parameter.limits.</p>
+<p>Finally, we define default uncertainty information for the state vector (this does not directly affect the
+running of the EOLDAS (<tt class="docutils literal"><span class="pre">parameter.x.sd</span></tt>), and define the bounds for each state vector (use None if no bound is to be used).
+Here, we set the lower bound as 0 and the upper bound as 1 for both parameters.</p>
+<p>The next section sets up general conditions:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="n">general</span><span class="p">]</span>
+<span class="n">doplot</span><span class="o">=</span><span class="bp">True</span>
+<span class="n">help_do_plot</span><span class="o">=</span><span class="s">&#39;do plotting&#39;</span>
+</pre></div>
+</div>
+<p>In this case, we set a flag to do plotting when the results are written out.
+Plotting will use the filenames in any state variable section e.g. <tt class="docutils literal"><span class="pre">parameter.result.filename</span></tt>
+to generate a series of plots with filenames the same as this data filename. We will
+see some examples later.</p>
+<p>The next section sets up the operators that we want to define here.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="n">operator</span><span class="p">]</span>
+<span class="n">modelt</span><span class="o">.</span><span class="n">name</span><span class="o">=</span><span class="n">DModel_Operator</span>
+<span class="n">modelt</span><span class="o">.</span><span class="n">datatypes</span> <span class="o">=</span> <span class="n">x</span>
+<span class="n">obs</span><span class="o">.</span><span class="n">name</span><span class="o">=</span><span class="n">Operator</span>
+<span class="n">obs</span><span class="o">.</span><span class="n">datatypes</span> <span class="o">=</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span>
+</pre></div>
+</div>
+<p>Here, we define two operators, <tt class="docutils literal"><span class="pre">DModel_Operator</span></tt> and <tt class="docutils literal"><span class="pre">Operator</span></tt>. These names
+refer directly to python classes for the operators in EOLDAS. The base class is &#8216;Operator&#8217;
+which implements the Identity operator.  All other classes are derived from this.
+The differential operator works only on the x state vector, which is equlivalent to defining
+<img class="math" src="../../_images/math/b0f58030de0841ce02f2fbeea00dfdcbdcbd78bd.png" alt="\mathbf{y_{obs}}=0"/>. The operator &#8216;Operator&#8217; access both x and y data if it to
+act as a Prior constraint, so we set up x and y datatypes.</p>
+<p>Next we set the details of these operators. First, the differential operator:</p>
+<div class="highlight-python"><pre>[operator.modelt.x]
+names = $parameter.names
+sd = [1.0]*len($operator.modelt.x.names)
+datatype = x
+
+[operator.modelt.rt_model]
+model_order=1
+help_model_order='The differential model order'
+wraparound=periodic,365
+</pre>
+</div>
+<p>where we specify which state vector elements this operator has access to (all of those
+in parameter.names here) and set up the default uncertainty and datatype.</p>
+<p>We then set the parameters specific to the &#8216;model&#8217; <img class="math" src="../../_images/math/12cdaf71983dffcb469258bbb68113bcff3799a7.png" alt="H(\mathbf{x})"/>, in this case
+the order of the differential model (2 here) and the edge conditions (periodic, with
+a period of 200 (days)).</p>
+<p>Finally, we set up the operator <tt class="docutils literal"><span class="pre">operator.obs</span></tt>, specifically, parameters for its
+x and y state vectors.</p>
+<div class="highlight-python"><pre>[operator.obs.x]
+names = $parameter.names[1:]
+sd = [1.0]*len($operator.obs.x.names)
+help_sd='Set the observation sd'
+datatype = x
+
+[operator.obs.y]
+control = [mask]
+names = $parameter.names[1:]
+sd = [0.15]*len($operator.obs.x.names)
+help_sd="set the sd for the observations"
+datatype = y
+state = data/Identity/random_ndvi1.dat
+help_state = "Set the y state vector"
+
+[operator.obs.y.result]
+filename = output/Identity/NDVI_fwd.params
+</pre>
+</div>
+<p>specifying default uncertainty information, data types and any required output files.
+Here, we wish to write out the results in <tt class="docutils literal"><span class="pre">operator.obs.y</span></tt>, so we specify a filename for this.
+Again, we see the use of a &#8216;help&#8217; variable, which here allows <tt class="docutils literal"><span class="pre">operator.obs.y.result.filename</span></tt>
+to be set from the command line. This interfacing to the command line means that
+a single configuration file can generally serve for multiple experiments and the user
+does not need to keep generating new ones.</p>
+<p>The main program can be accessed in various ways. One way is to write some front
+end code that calls the eoldas python code.</p>
+<p>An example is <a class="reference external" href="solve_eoldas_identity.py">solve_eoldas_identity.py</a> that includes three sections:</p>
+<p>First, some code to generate a synthetic dataset.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">import</span> <span class="nn">pdb</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="k">def</span> <span class="nf">create_data</span> <span class="p">(</span> <span class="n">n_per</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">noise</span><span class="o">=</span><span class="mf">0.15</span><span class="p">,</span> <span class="n">obs_off</span><span class="o">=</span><span class="mf">0.33</span><span class="p">,</span> \
+					<span class="n">window_size</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">4</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create synthetic &quot;NDVI-like&quot; data for a fictitious time series. We return</span>
+<span class="sd">    the original data, noisy data (using IID Gaussian noise), the QA flag as well</span>
+<span class="sd">    as the time axis.</span>
+<span class="sd">    </span>
+<span class="sd">    Missing observations are simulated by drawing a random number between 0 and 1</span>
+<span class="sd">    and checking against obs_off.</span>
+<span class="sd">    </span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    n_per : integer</span>
+<span class="sd">    Observation periodicity. By default, assumes every 8 days</span>
+
+<span class="sd">    noise : float</span>
+<span class="sd">    The noise standard deviation. By default, 0.15</span>
+
+<span class="sd">    obs_off : float</span>
+<span class="sd">    The threshold to decide on missing observations in the time series.</span>
+
+<span class="sd">    window_size : integer, odd</span>
+<span class="sd">    window size for savitzky_golay filtering. A large window size will lead</span>
+<span class="sd">    to larger data gaps by correlating the noise. Set to zero by default</span>
+<span class="sd">    which applies no smoothing.</span>
+
+<span class="sd">    order : integer</span>
+<span class="sd">    order of the savitzky_golay filter. By default 4.</span>
+<span class="sd">    </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="kn">from</span> <span class="nn">savitzky_golay</span> <span class="kn">import</span> <span class="n">savitzky_golay</span>
+    <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+    <span class="n">doys</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span> <span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">365</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_per</span><span class="p">)</span>
+    <span class="n">ndvi_clean</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">((</span><span class="n">doys</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mf">72.</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> 
+    <span class="n">ndvi</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">doys</span><span class="o">/</span><span class="mf">72.</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> 
+    <span class="c"># add Gaussian noise of sd noise</span>
+    <span class="n">ndvi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="n">ndvi</span><span class="p">,</span><span class="n">noise</span><span class="p">,</span><span class="n">ndvi</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+     
+    <span class="c"># set the qa flags for each sample to 1 (good data)</span>
+    <span class="n">qa_flag</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones_like</span> <span class="p">(</span> <span class="n">ndvi</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">int32</span> <span class="p">)</span>
+    <span class="n">passer</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span> <span class="n">ndvi</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">window_size</span> <span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+        <span class="c"># force odd</span>
+        <span class="n">window_size</span> <span class="o">=</span> <span class="mi">2</span><span class="o">*</span><span class="p">(</span><span class="n">window_size</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+        <span class="n">passer</span> <span class="o">=</span> <span class="n">savitzky_golay</span><span class="p">(</span><span class="n">passer</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="n">window_size</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">)</span>
+    <span class="c"># assign a proportion of the qa to 0 from an ordering of the smoothed </span>
+    <span class="c"># random numbers</span>
+    <span class="n">qa_flag</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="n">passer</span><span class="p">)[:</span><span class="n">passer</span><span class="o">.</span><span class="n">size</span> <span class="o">*</span> <span class="n">obs_off</span><span class="p">]]</span>  <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">return</span> <span class="p">(</span> <span class="n">doys</span><span class="p">,</span> <span class="n">ndvi_clean</span><span class="p">,</span> <span class="n">ndvi</span><span class="p">,</span> <span class="n">qa_flag</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Here, we generate some NDVI data which has a trajectory of a sine wave for the first half of the year
+and is flat at zero for the second half. The sampling is controlled by n_per and obs_off. The
+parameter obs_off randomly removes a proportion of the data. If window_size and order are set
+then a savitzky_golay filter is used to induce correlation in the timing of the samples that
+are removed from thie dataset (qa=0). This mimics what we practically have in Optical Earth Observation
+with temporal correlation in cloud cover.</p>
+<p>The next section calculates the &#8216;ideal&#8217; value of <img class="math" src="../../_images/math/66981fa3920210c6ad8dbe5e968783d5dd7520c3.png" alt="\gamma"/> by calculating the root mean
+squared deviation of the original dataset. We use this ideal gamma here for to demonstrate the physical meaning
+of the gamma value, though in practice this would be unknown. This section also writes the dataset to a temporary file
+in &#8216;BRDF&#8217; format.</p>
+<p>All of this so far standard python coding, though such datasets could be generated in many other ways.
+The final section interfaces to the top level of the eoldas code, which is what is of immediate concern in this tutorial.</p>
+<div class="highlight-python"><div class="highlight"><pre>    <span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span><span class="nn">tempfile</span>
+    <span class="n">this</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="kn">import</span>  <span class="nn">eoldas</span>
+
+    <span class="c"># SD of noise</span>
+    <span class="n">noise</span><span class="o">=</span><span class="mf">0.15</span>
+    <span class="c"># nominal sampling period</span>
+    <span class="n">n_per</span><span class="o">=</span><span class="mi">7</span>
+    <span class="c"># proportion of missing samples</span>
+    <span class="n">obs_off</span><span class="o">=</span><span class="mf">0.33</span>
+    <span class="c"># order of differential model (integer)</span>
+    <span class="n">model_order</span><span class="o">=</span><span class="mi">1</span>
+    <span class="c"># sgwindow is larger to create larger data gaps</span>
+    <span class="n">sgwindow</span><span class="o">=</span><span class="mi">10</span>
+
+    <span class="c"># set up data for this experiment</span>
+    <span class="nb">file</span><span class="p">,</span> <span class="n">ideal_gamma</span><span class="p">,</span><span class="n">doys</span><span class="p">,</span><span class="n">ndvi_clean</span><span class="p">,</span><span class="n">ndvi</span><span class="p">,</span><span class="n">qa_flag</span>  <span class="o">=</span> \
+		<span class="n">prepare</span><span class="p">(</span><span class="n">noise</span><span class="o">=</span><span class="n">noise</span><span class="p">,</span><span class="n">n_per</span><span class="o">=</span><span class="n">n_per</span><span class="p">,</span>\
+			<span class="n">obs_off</span><span class="o">=</span><span class="n">obs_off</span><span class="p">,</span><span class="n">model_order</span><span class="o">=</span><span class="n">model_order</span><span class="p">,</span>\
+			<span class="n">sgwindow</span><span class="o">=</span><span class="n">sgwindow</span><span class="p">)</span>
+
+    <span class="c"># set gamma to less than the the theoretical value</span>
+    <span class="n">gamma</span> <span class="o">=</span> <span class="n">ideal_gamma</span><span class="o">*</span><span class="mf">0.33</span>
+
+    <span class="c"># set op file names</span>
+    <span class="n">xfile</span> <span class="o">=</span> <span class="s">&#39;output/Identity/NDVI_Identity.params&#39;</span>
+    <span class="n">yfile</span> <span class="o">=</span> <span class="s">&#39;output/Identity/NDVI_fwd.params&#39;</span>
+
+    <span class="c"># initialise optuions for DA overriding any in config files</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="s">&#39;eoldas &#39;</span> <span class="o">+</span>  \
+                <span class="s">&#39; --conf=config_files/eoldas_config.conf --conf=config_files/Identity.conf &#39;</span> <span class="o">+</span> \
+                <span class="s">&#39; --logfile=mylogs/Identity.log &#39;</span> <span class="o">+</span> \
+                <span class="s">&#39; --calc_posterior_unc &#39;</span> <span class="o">+</span> \
+                <span class="s">&#39; --parameter.solve=0,1 &#39;</span> <span class="o">+</span> \
+		<span class="s">&#39; --parameter.result.filename=</span><span class="si">%s</span><span class="s"> &#39;</span><span class="o">%</span><span class="n">xfile</span> <span class="o">+</span>\
+                <span class="s">&#39; --parameter.x.default=</span><span class="si">%f</span><span class="s">,0.0 &#39;</span><span class="o">%</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span> <span class="o">+</span> \
+		<span class="s">&#39; --operator.obs.y.result.filename=</span><span class="si">%s</span><span class="s">&#39;</span><span class="o">%</span><span class="n">yfile</span> <span class="o">+</span>\
+                <span class="s">&#39; --operator.obs.y.state=</span><span class="si">%s</span><span class="s">&#39;</span><span class="o">%</span><span class="nb">file</span><span class="o">+</span>\
+                <span class="s">&#39; --operator.modelt.rt_model.model_order=</span><span class="si">%d</span><span class="s"> &#39;</span><span class="o">%</span><span class="n">model_order</span> 
+
+    <span class="c"># initialise eoldas</span>
+    <span class="bp">self</span> <span class="o">=</span> <span class="n">eoldas</span><span class="o">.</span><span class="n">eoldas</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+    <span class="c"># solve DA</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">write</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    
+</pre></div>
+</div>
+<p>The first part of the code extends the system path for where it searches for libraries.
+This is done relative to where solve_eoldas_identity.py is (in the bin directory of
+the distribution). After that, we set up values for the parameters for generating
+the synthetic dataset.</p>
+<p>The interface to the eoldas here is mainly to make a string with a number of flags.
+The most important flag is <tt class="docutils literal"><span class="pre">--conf=config_files/Identity.conf</span></tt> which specifies the
+configuration file for this experiment. In addition, <tt class="docutils literal"><span class="pre">--conf=eoldas_config.conf</span></tt>
+is given, which specifies a system default configuration file, <tt class="docutils literal"><span class="pre">eoldas_config.conf</span></tt>.</p>
+<p>So, the simplest &#8216;top level&#8217; interface to eoldas from python code involves:</p>
+<div class="highlight-python"><div class="highlight"><pre>    <span class="n">gamma</span> <span class="o">=</span> <span class="n">ideal_gamma</span><span class="o">*</span><span class="mf">0.33</span>
+
+    <span class="c"># set op file names</span>
+    <span class="n">xfile</span> <span class="o">=</span> <span class="s">&#39;output/Identity/NDVI_Identity.params&#39;</span>
+    <span class="n">yfile</span> <span class="o">=</span> <span class="s">&#39;output/Identity/NDVI_fwd.params&#39;</span>
+
+    <span class="c"># initialise optuions for DA overriding any in config files</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="s">&#39;eoldas &#39;</span> <span class="o">+</span>  \
+                <span class="s">&#39; --conf=config_files/eoldas_config.conf --conf=config_files/Identity.conf &#39;</span> <span class="o">+</span> \
+                <span class="s">&#39; --logfile=mylogs/Identity.log &#39;</span> <span class="o">+</span> \
+                <span class="s">&#39; --calc_posterior_unc &#39;</span> <span class="o">+</span> \
+                <span class="s">&#39; --parameter.solve=0,1 &#39;</span> <span class="o">+</span> \
+		<span class="s">&#39; --parameter.result.filename=</span><span class="si">%s</span><span class="s"> &#39;</span><span class="o">%</span><span class="n">xfile</span> <span class="o">+</span>\
+                <span class="s">&#39; --parameter.x.default=</span><span class="si">%f</span><span class="s">,0.0 &#39;</span><span class="o">%</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span> <span class="o">+</span> \
+		<span class="s">&#39; --operator.obs.y.result.filename=</span><span class="si">%s</span><span class="s">&#39;</span><span class="o">%</span><span class="n">yfile</span> <span class="o">+</span>\
+                <span class="s">&#39; --operator.obs.y.state=</span><span class="si">%s</span><span class="s">&#39;</span><span class="o">%</span><span class="nb">file</span><span class="o">+</span>\
+                <span class="s">&#39; --operator.modelt.rt_model.model_order=</span><span class="si">%d</span><span class="s"> &#39;</span><span class="o">%</span><span class="n">model_order</span> 
+</pre></div>
+</div>
+<p>and</p>
+<div class="highlight-python"><div class="highlight"><pre>                <span class="s">&#39; --operator.modelt.rt_model.model_order=</span><span class="si">%d</span><span class="s"> &#39;</span><span class="o">%</span><span class="n">model_order</span> 
+
+    <span class="c"># initialise eoldas</span>
+    <span class="bp">self</span> <span class="o">=</span> <span class="n">eoldas</span><span class="o">.</span><span class="n">eoldas</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+    <span class="c"># solve DA</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">write</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>where we set up the text string, initiate the eoldas object (<tt class="docutils literal"><span class="pre">eoldas.eoldas</span></tt>) and then
+call the <tt class="docutils literal"><span class="pre">eoldas.solve()</span></tt> method.</p>
+<p>This command string is clearly of some importance.
+The flags <tt class="docutils literal"><span class="pre">--logfile=mylogs/Identity.log</span></tt> and <tt class="docutils literal"><span class="pre">--calc_posterior_unc</span></tt> correspond
+to items in the <tt class="docutils literal"><span class="pre">[general]</span></tt> section of the configuration file.
+Here, <tt class="docutils literal"><span class="pre">eoldas_config.conf</span></tt> contains the lines:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="n">general</span><span class="p">]</span>
+<span class="n">datadir</span> <span class="o">=</span> <span class="o">.</span><span class="p">,</span> <span class="n">data</span>
+<span class="n">help_datadir</span> <span class="o">=</span><span class="s">&quot;Specify where the data and or conf files are&quot;</span>
+<span class="n">here</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwdu</span><span class="p">()</span>
+<span class="n">grid</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">is_spectral</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">calc_posterior_unc</span><span class="o">=</span><span class="bp">False</span>
+<span class="n">help_calc_posterior_unc</span> <span class="o">=</span><span class="s">&quot;Switch to calculate the posterior uncertainty&quot;</span>
+<span class="n">write_results</span><span class="o">=</span><span class="bp">True</span>
+<span class="n">help_write_results</span><span class="o">=</span><span class="s">&quot;Flag to make eoldas write its results to files&quot;</span>
+<span class="n">init_test</span><span class="o">=</span><span class="bp">False</span>
+<span class="n">help_init_test</span><span class="o">=</span><span class="s">&quot;Flag to make eoldas run a test of the cost functions before proceeding with DA&quot;</span>
+<span class="n">doplot</span><span class="o">=</span><span class="bp">False</span>
+<span class="n">plotmod</span><span class="o">=</span><span class="mi">100000000</span>
+<span class="n">plotmovie</span><span class="o">=</span><span class="bp">False</span>
+
+<span class="p">[</span><span class="n">general</span><span class="o">.</span><span class="n">optimisation</span><span class="p">]</span>
+<span class="c"># These are the default values</span>
+<span class="n">iprint</span><span class="o">=</span><span class="mi">1</span>
+<span class="n">gtol</span><span class="o">=</span><span class="mf">1e-3</span>
+<span class="n">maxIter</span><span class="o">=</span><span class="mf">1e4</span>
+<span class="n">maxFunEvals</span><span class="o">=</span><span class="mf">2e4</span>
+<span class="n">plot</span><span class="o">=</span><span class="mi">0</span>
+<span class="c"># see http://openopt.org/NLP#Box-bound_constrained</span>
+<span class="n">solverfn</span><span class="o">=</span><span class="n">scipy_lbfgsb</span> 
+<span class="n">randomise</span><span class="o">=</span><span class="bp">False</span>
+<span class="n">help_randomise</span><span class="o">=</span><span class="s">&#39;Randomise the starting point&#39;</span>
+<span class="n">no_df</span> <span class="o">=</span> <span class="bp">False</span>
+</pre></div>
+</div>
+<p>To understand how e.g the flag <tt class="docutils literal"><span class="pre">--calc_posterior_unc</span></tt> can be used we can look at:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">calc_posterior_unc</span><span class="o">=</span><span class="bp">False</span>
+<span class="n">help_calc_posterior_unc</span> <span class="o">=</span><span class="s">&quot;Switch to calculate the posterior uncertainty&quot;</span>
+</pre></div>
+</div>
+<p>where we set the default value of the item (<tt class="docutils literal"><span class="pre">False</span></tt>) and also have a
+&#8216;help&#8217; statement which allows this value to be overridden.
+You shouldn&#8217;t normally need to change things in the system configuration file
+<tt class="docutils literal"><span class="pre">eoldas_config.conf</span></tt>. This flag controls whether we calculate the posterior
+iuncertainty or not. The default is False because it can be quite computationally
+expensive and is often best done in a post processing step.</p>
+<p>The flag <tt class="docutils literal"><span class="pre">--operator.obs.y.state=filename</span></tt> refers specifically to the section
+<tt class="docutils literal"><span class="pre">operator.obs.y.state</span></tt> of the configuration, which is something we have set up in
+<tt class="docutils literal"><span class="pre">Identity.conf</span></tt> with a &#8216;help&#8217; field, so we can override the default value
+set in the configuration file.</p>
+<div class="highlight-python"><pre>
+[operator.obs.y]
+control = [mask]
+names = $parameter.names[1:]
+sd = [0.15]*len($operator.obs.x.names)
+help_sd="set the sd for the observations"
+datatype = y
+</pre>
+</div>
+<p>If we run <tt class="docutils literal"><span class="pre">solve_eoldas_identity.py</span></tt>, it sends logging information to <tt class="docutils literal"><span class="pre">mylogs/Identity.log</span></tt>
+and reports (to the stderr) the progress of the optimisation, &#8216;f&#8217; being
+the total of all of the <img class="math" src="../../_images/math/abb5588023cfa1ac14643e9778699f03eecc57a3.png" alt="J"/> terms for this configuration. It should
+converge to a solution within some tens of iterations and result in a final value of
+<img class="math" src="../../_images/math/abb5588023cfa1ac14643e9778699f03eecc57a3.png" alt="J"/> of around 1800. We set the name of the logfile in <tt class="docutils literal"><span class="pre">solve_eoldas_identity.py</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre>    <span class="k">if</span> <span class="n">window_size</span> <span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
+</pre></div>
+</div>
+<p>There is a lot of detail in the log file about exactly what value terms are set to
+and the progress of the eoldas. It also contains information on the individual <img class="math" src="../../_images/math/abb5588023cfa1ac14643e9778699f03eecc57a3.png" alt="J"/>
+terms:</p>
+<p>A log file is important to the running of eoldas, as the processing can take quite some time
+for some problems.</p>
+<p>The state vector results will be written to output/Identity/NDVI_Identity.params
+because we first specified this in Identity.conf:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="n">parameter</span><span class="o">.</span><span class="n">result</span><span class="p">]</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="n">output</span><span class="o">/</span><span class="n">Identity</span><span class="o">/</span><span class="n">NDVI_Identity</span><span class="o">.</span><span class="n">params</span>
+<span class="n">format</span> <span class="o">=</span> <span class="s">&#39;PARAMETERS&#39;</span>
+</pre></div>
+</div>
+<p>(actually, since we also set the comamnd <tt class="docutils literal"><span class="pre">'</span> <span class="pre">--operator.obs.y.result.filename=%s'%yfile</span></tt> in
+the code we have written, this will override what is in the parameter file).</p>
+<p>The output file format is a general &#8216;PARAMETERS&#8217; format
+that should look something like this:</p>
+<p>The first line of the file is a header statement that describes the location
+fields (&#8216;time&#8217; here) and state variables (gamma_time and NDVI here)
+and subsequent lines give the values for those fields.
+This format can be used for input data, but
+it cannot at present be used to define a full input covariance matrix, only
+the standard deviation for each observation as in this example.</p>
+<p>A graph of the result is in <tt class="docutils literal"><span class="pre">output/Identity/NDVI_Identity.params.plot.x.png</span></tt>:</p>
+<img alt="output/Identity/NDVI_Identity.params.plot.x.png" class="align-center" src="eoldas_release/doc/../output/Identity/NDVI_Identity.params.plot.x.png" style="width: 700px;" />
+<p>This result is quite interesting for understanding how our DA system works:
+The plot shows the mean of the estimate of the NDVI state vector in the lower panel
+(the upper panel shows the value of gamma_time which we did not solve for) as a red
+line as we solve for the state every day (of 365 days). The 95% confidence interval
+is shown shaded in grey. We will show this below in a more refined plot of
+the results.</p>
+<p>We also specified the &#8216;y&#8217; data to be written out (in Identity.conf):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">help_state</span> <span class="o">=</span> <span class="s">&quot;Set the y state vector&quot;</span>
+
+<span class="p">[</span><span class="n">operator</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">result</span><span class="p">]</span>
+<span class="n">filename</span> <span class="o">=</span> <span class="n">output</span><span class="o">/</span><span class="n">Identity</span><span class="o">/</span><span class="n">NDVI_fwd</span><span class="o">.</span><span class="n">params</span>
+</pre></div>
+</div>
+<p>so this goes to a file <tt class="docutils literal"><span class="pre">output/Identity/NDVI_fwd.params</span></tt> unless the flag
+<tt class="docutils literal"><span class="pre">--operator.obs.y.result.filename=somethingElse.dat</span></tt> is used.
+The format of this file is the same as above, but it shows the retrieved
+NDVI data since this reports <img class="math" src="../../_images/math/df4e0c1b626e2abd358c8aa60271a28778f866e6.png" alt="H(x)"/>.</p>
+<p>The original dataset is output form convenience in the same format as the
+y state, being <tt class="docutils literal"><span class="pre">output/Identity/NDVI_fwd.params_orig</span></tt> here:</p>
+<p>Various other graphics are output for a &#8216;y&#8217; state:</p>
+<p>A plot at each location, in output/Identity/NDVI_fwd.params.plot.y.png
+(not of much relevance in this example):</p>
+<img alt="output/Identity/NDVI_fwd.params.plot.y.png" class="align-center" src="eoldas_release/doc/../output/Identity/NDVI_fwd.params.plot.y.png" style="width: 700px;" />
+<p>A plot of the observations and modelled values as a function of location
+(the observations are the green dots) in output/Identity/NDVI_fwd.params.plot.y2.png:</p>
+<img alt="output/Identity/NDVI_fwd.params.plot.y2.png" class="align-center" src="eoldas_release/doc/../output/Identity/NDVI_fwd.params.plot.y2.png" style="width: 700px;" />
+<p>and a plot of the x state vector associated with this operator (NDVI here).</p>
+<img alt="output/Identity/NDVI_fwd.params.plot.x.png" class="align-center" src="eoldas_release/doc/../output/Identity/NDVI_fwd.params.plot.x.png" style="width: 700px;" />
+</div>
+</div>
+<div class="section" id="example-plotting-data-from-the-output-files">
+<h2>Example plotting data from the output files<a class="headerlink" href="#example-plotting-data-from-the-output-files" title="Permalink to this headline">¶</a></h2>
+<p>The above plots are automatically generated by eoldas provided general.doplot is True
+but these are intended as quicklooks, and users are likely to want to form their own plots.</p>
+<p>An example of this is implemented in <a class="reference external" href="bin/example1plot.py">example1plot.py</a>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pylab</span> <span class="kn">as</span> <span class="nn">plt</span>
+<span class="c">#</span>
+<span class="c"># Some plotting of the synthetic and retrieved data</span>
+
+<span class="c"># generate the clean data</span>
+<span class="n">doys</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span> <span class="p">(</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">365</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">ndvi_clean</span> <span class="o">=</span>  <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sin</span><span class="p">((</span><span class="n">doys</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mf">72.</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c"># read the state file</span>
+<span class="n">state</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;output/Identity/NDVI_Identity.params&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+<span class="n">sdata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">split</span><span class="p">())</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">state</span><span class="p">[</span><span class="mi">1</span><span class="p">:]])</span>
+<span class="n">sNdvi</span> <span class="o">=</span> <span class="n">sdata</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">sdNdvi</span> <span class="o">=</span> <span class="n">sdata</span><span class="p">[:,</span><span class="mi">4</span><span class="p">]</span>
+
+<span class="c"># noisy sample data</span>
+<span class="n">noisy</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="s">&#39;output/Identity/NDVI_fwd.params_orig&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+<span class="n">ndata</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">i</span><span class="o">.</span><span class="n">split</span><span class="p">())</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">float</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">noisy</span><span class="p">[</span><span class="mi">1</span><span class="p">:]])</span>
+<span class="n">nNdvi</span> <span class="o">=</span> <span class="n">ndata</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span>
+<span class="n">sdnNdvi</span> <span class="o">=</span> <span class="n">ndata</span><span class="p">[:,</span><span class="mi">3</span><span class="p">]</span>
+<span class="n">ndoys</span> <span class="o">=</span> <span class="n">ndata</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+
+<span class="c"># retrieved</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">fill_between</span><span class="p">(</span><span class="n">doys</span><span class="p">,</span><span class="n">y1</span><span class="o">=</span><span class="n">sNdvi</span><span class="o">-</span><span class="mf">1.96</span><span class="o">*</span><span class="n">sdNdvi</span><span class="p">,</span><span class="n">y2</span><span class="o">=</span><span class="n">sNdvi</span><span class="o">+</span><span class="mf">1.96</span><span class="o">*</span><span class="n">sdNdvi</span><span class="p">,</span><span class="n">facecolor</span><span class="o">=</span><span class="s">&#39;0.8&#39;</span><span class="p">)</span>
+<span class="n">p1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">doys</span><span class="p">,</span><span class="n">sNdvi</span><span class="p">,</span><span class="s">&#39;r&#39;</span><span class="p">)</span>
+<span class="c"># original</span>
+<span class="n">p2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">doys</span><span class="p">,</span><span class="n">ndvi_clean</span><span class="p">,</span><span class="s">&#39;g&#39;</span><span class="p">)</span>
+<span class="c"># samples used</span>
+<span class="n">p3</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">errorbar</span><span class="p">(</span><span class="n">ndoys</span><span class="p">,</span><span class="n">nNdvi</span><span class="p">,</span><span class="n">yerr</span><span class="o">=</span><span class="n">sdnNdvi</span><span class="o">*</span><span class="mf">1.96</span><span class="p">,</span><span class="n">fmt</span><span class="o">=</span><span class="s">&#39;bo&#39;</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="n">p2</span><span class="p">,</span><span class="n">p3</span><span class="p">,</span><span class="n">p1</span><span class="p">],[</span><span class="s">&#39;Original state&#39;</span><span class="p">,</span><span class="s">&#39;Sampled noisy state&#39;</span><span class="p">,</span><span class="s">&#39;Retrieved state&#39;</span><span class="p">])</span>
+
+<span class="c">#plt.show()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">&#39;images/example1plot.png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<img alt="example 1 plot" class="align-center" src="eoldas_release/doc/../images/example1plot.png" style="width: 700px;" />
+<p>We can see that smoothers of this sort have
+some difficulty maintaining sudden changes, although this is quite challenging here given the
+level of noise amd the rather large data gaps.</p>
+<p>More importantly, we have used the smoother to interpolate over the missing observations and to reduce uncertainty.</p>
+<p>If we inspect the file <tt class="docutils literal"><span class="pre">output/Identity/NDVI_Identity.params</span> <span class="pre">&lt;output/Identity/NDVI_Identity.params&gt;</span></tt>:</p>
+<p>alongside the original data <tt class="docutils literal"><span class="pre">output/Identity/NDVI_fwd.params_orig</span> <span class="pre">&lt;output/Identity/NDVI_Identity.params&gt;</span></tt>:</p>
+<p>We note that the original state here (green line) lies entirely within the 95% CI. The error reduction has been of the order of 2.2 (compare sd-NDVI after the DA with that prior to it).
+We can see that the uncertainty at the datapoints has been reduced from 0.15 (that of the input data)
+to typically around 0.065. This grows slightly (to around 0.10) when the data gaps are large.</p>
+<p>The impact of &#8216;filtering&#8217; in this way (optimising a fit of the model to the
+observations) is to smooth the data and reduce uncertainty in the output. The reduction in uncertainty
+is related to the amount of smoothing that we apply. The second effect is to interpolate between
+observations, with uncertainty growing where we have no observations.</p>
+<p>You might try changing the value of gamma used and seeing the effect on the results.</p>
+<p>We could do this by modifying a few lines of <tt class="docutils literal"><span class="pre">solve_eoldas_identity.py</span></tt> to produce <tt class="docutils literal"><span class="pre">solve_eoldas_identity1.py</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span><span class="nn">tempfile</span>
+    <span class="n">this</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="kn">import</span> <span class="nn">eoldas</span>
+
+    <span class="c"># SD of noise</span>
+    <span class="n">noise</span><span class="o">=</span><span class="mf">0.15</span>
+    <span class="c"># nominal sampling period</span>
+    <span class="n">n_per</span><span class="o">=</span><span class="mi">7</span>
+    <span class="c"># proportion of missing samples</span>
+    <span class="n">obs_off</span><span class="o">=</span><span class="mf">0.33</span>
+    <span class="c"># order of differential model (integer)</span>
+    <span class="n">model_order</span><span class="o">=</span><span class="mi">1</span>
+    <span class="c"># sgwindow is larger to create larger data gaps</span>
+    <span class="n">sgwindow</span><span class="o">=</span><span class="mi">10</span>
+
+    <span class="c"># set up data for this experiment</span>
+    <span class="nb">file</span><span class="p">,</span> <span class="n">ideal_gamma</span><span class="p">,</span><span class="n">doys</span><span class="p">,</span><span class="n">ndvi_clean</span><span class="p">,</span><span class="n">ndvi</span><span class="p">,</span><span class="n">qa_flag</span>  <span class="o">=</span> \
+		<span class="n">prepare</span><span class="p">(</span><span class="n">noise</span><span class="o">=</span><span class="n">noise</span><span class="p">,</span><span class="n">n_per</span><span class="o">=</span><span class="n">n_per</span><span class="p">,</span>\
+			<span class="n">obs_off</span><span class="o">=</span><span class="n">obs_off</span><span class="p">,</span><span class="n">model_order</span><span class="o">=</span><span class="n">model_order</span><span class="p">,</span>\
+			<span class="n">sgwindow</span><span class="o">=</span><span class="n">sgwindow</span><span class="p">)</span>
+
+    <span class="c"># set gamma to less than the the theoretical value</span>
+    <span class="n">gamma</span> <span class="o">=</span> <span class="n">ideal_gamma</span><span class="o">*</span><span class="mf">0.45</span>
+
+    <span class="c"># set op file names</span>
+    <span class="n">xfile</span> <span class="o">=</span> <span class="s">&#39;output/Identity/NDVI_Identity1.params&#39;</span>
+    <span class="n">yfile</span> <span class="o">=</span> <span class="s">&#39;output/Identity/NDVI_fwd1.params&#39;</span>
+
+    <span class="c"># initialise optuions for DA overriding any in config files</span>
+</pre></div>
+</div>
+<p>which writes out to <tt class="docutils literal"><span class="pre">output/Identity/NDVI_Identity1.params</span></tt> and <tt class="docutils literal"><span class="pre">output/Identity/NDVI_fwd1.params</span></tt>  and has a gamma value that is 0.45/0.33 of that previously used.</p>
+<p>Now, plotting this using <tt class="docutils literal"><span class="pre">example1plot1.py</span></tt>:</p>
+<img alt="example 1 plot" class="align-center" src="eoldas_release/doc/../images/example1plot1.png" style="width: 700px;" />
+<p>This is possibly a better result, but in fact what we see is further limitation of the model that we have chosen here: we enforce wraparound (i.e. the NDVI at day 1 is expected to be the same as at day 365) and we enforce smoothness (so as we increase the gamma, the smoothness, we over-smooth at the sudden change that occurs half way through the year).</p>
+<p>We could remove the wraparound condition, but in practice, it is better simply to weaken this constraint. We have done this in <tt class="docutils literal"><span class="pre">solve_eoldas_identity2.py</span></tt>:</p>
+<div class="highlight-python"><pre>if __name__ == "__main__":
+    import sys,tempfile
+    this = sys.argv[0]
+    import eoldas
+
+    # SD of noise
+    noise=0.15
+    # nominal sampling period
+    n_per=7
+    # proportion of missing samples
+    obs_off=0.33
+    # order of differential model (integer)
+    model_order=1
+    # sgwindow is larger to create larger data gaps
+    sgwindow=10
+
+    # set up data for this experiment
+    file, ideal_gamma,doys,ndvi_clean,ndvi,qa_flag  = \
+		prepare(noise=noise,n_per=n_per,\
+			obs_off=obs_off,model_order=model_order,\
+			sgwindow=sgwindow)
+
+    # set gamma to less than the the theoretical value
+    gamma = ideal_gamma*0.33
+
+    # set op file names
+    xfile = 'output/Identity/NDVI_Identity2.params'
+    yfile = 'output/Identity/NDVI_fwd2.params'
+
+    # initialise optuions for DA overriding any in config files
+    cmd = 'eoldas ' +  \
+                ' --conf=config_files/eoldas_config.conf --conf=config_files/Identity.conf ' + \
+                ' --logfile=mylogs/Identity.log ' + \
+                ' --calc_posterior_unc ' + \
+                ' --parameter.solve=0,1 ' + \
+		' --parameter.result.filename=%s '%xfile +\
+                ' --parameter.x.default=%f,0.0 '%(gamma) + \
+</pre>
+</div>
+<p>which write out to <tt class="docutils literal"><span class="pre">output/Identity/NDVI_Identity2.params</span></tt> and <tt class="docutils literal"><span class="pre">output/Identity/NDVI_fwd2.params</span></tt>  and has the same (higher) gamma value used above.</p>
+<p>Now, plotting this using <tt class="docutils literal"><span class="pre">example1plot2.py</span></tt>:</p>
+<img alt="example 1 plot" class="align-center" src="eoldas_release/doc/../images/example1plot2.png" style="width: 700px;" />
+<p>If you re-run these scripts several times, so that you see different configurations for the temporal sampling, you will notice that the interpolation sometimes behaves well over the entire dataset (for some given gamma) and sometimes doesn&#8217;t. For example:</p>
+<img alt="example 1 plot" class="align-center" src="eoldas_release/doc/../images/example1plot3.png" style="width: 700px;" />
+</div>
+<div class="section" id="interfacing-a-little-more-deeply-with-the-eoldas-code">
+<h2>Interfacing a little more deeply with the eoldas code<a class="headerlink" href="#interfacing-a-little-more-deeply-with-the-eoldas-code" title="Permalink to this headline">¶</a></h2>
+<p>Whilst considering writing wrapper codes around eoldas functionality and outputs
+it is instructive to explore some of the data structure available.</p>
+<p>We can re-use the example solve_eoldas_identity.py developed above
+and access some of the data structure as shown in <a class="reference external" href="bin/solve_eoldas_identity_a.py">solve_eoldas_identity_a.py</a>.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#!/usr/bin/env python</span>
+<span class="kn">import</span> <span class="nn">pdb</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">sys</span><span class="o">,</span><span class="nn">tempfile</span>
+    <span class="n">this</span> <span class="o">=</span> <span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="kn">import</span>  <span class="nn">eoldas</span>
+    <span class="kn">from</span> <span class="nn">solve_eoldas_identity</span> <span class="kn">import</span> <span class="o">*</span>
+    <span class="c"># import the setup methods from solve_eoldas_identity</span>
+    <span class="kn">import</span> <span class="nn">pylab</span> <span class="kn">as</span> <span class="nn">plt</span>
+
+    <span class="c"># SD of noise</span>
+    <span class="n">noise</span><span class="o">=</span><span class="mf">0.15</span>
+    <span class="c"># nominal sampling period</span>
+    <span class="n">n_per</span><span class="o">=</span><span class="mi">7</span>
+    <span class="c"># proportion of missing samples</span>
+    <span class="n">obs_off</span><span class="o">=</span><span class="mf">0.33</span>
+    <span class="c"># order of differential model (integer)</span>
+    <span class="n">model_order</span><span class="o">=</span><span class="mi">1</span>
+    <span class="c"># sgwindow is larger to create larger data gaps</span>
+    <span class="n">sgwindow</span><span class="o">=</span><span class="mi">10</span>
+
+    <span class="c"># set up data for this experiment</span>
+    <span class="nb">file</span><span class="p">,</span> <span class="n">ideal_gamma</span><span class="p">,</span><span class="n">doys</span><span class="p">,</span><span class="n">ndvi_clean</span><span class="p">,</span><span class="n">ndvi</span><span class="p">,</span><span class="n">qa_flag</span>  <span class="o">=</span> \
+		<span class="n">prepare</span><span class="p">(</span><span class="n">noise</span><span class="o">=</span><span class="n">noise</span><span class="p">,</span><span class="n">n_per</span><span class="o">=</span><span class="n">n_per</span><span class="p">,</span>\
+			<span class="n">obs_off</span><span class="o">=</span><span class="n">obs_off</span><span class="p">,</span><span class="n">model_order</span><span class="o">=</span><span class="n">model_order</span><span class="p">,</span>\
+			<span class="n">sgwindow</span><span class="o">=</span><span class="n">sgwindow</span><span class="p">)</span>
+
+    <span class="c"># set gamma to thge theoretical value</span>
+    <span class="n">gamma</span> <span class="o">=</span> <span class="n">ideal_gamma</span>
+
+    <span class="c"># set op file names</span>
+    <span class="n">xfile</span> <span class="o">=</span> <span class="s">&#39;output/Identity/NDVI_Identity_a.params&#39;</span>
+    <span class="n">yfile</span> <span class="o">=</span> <span class="s">&#39;output/Identity/NDVI_fwd_a.params&#39;</span>
+
+    <span class="c"># initialise options for DA overriding any in config files</span>
+    <span class="c"># make sure we use some different output file names to othe scripts</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="s">&#39;eoldas &#39;</span> <span class="o">+</span>  \
+                <span class="s">&#39; --conf=config_files/eoldas_config.conf --conf=config_files/Identity.conf &#39;</span> <span class="o">+</span> \
+                <span class="s">&#39; --logfile=mylogs/Identity.log &#39;</span> <span class="o">+</span> \
+                <span class="s">&#39; --calc_posterior_unc &#39;</span> <span class="o">+</span> \
+                <span class="s">&#39; --parameter.solve=0,1 &#39;</span> <span class="o">+</span> \
+		<span class="s">&#39; --parameter.result.filename=</span><span class="si">%s</span><span class="s"> &#39;</span><span class="o">%</span><span class="n">xfile</span> <span class="o">+</span>\
+                <span class="s">&#39; --parameter.x.default=</span><span class="si">%f</span><span class="s">,0.0 &#39;</span><span class="o">%</span><span class="p">(</span><span class="n">gamma</span><span class="p">)</span> <span class="o">+</span> \
+		<span class="s">&#39; --operator.obs.y.result.filename=</span><span class="si">%s</span><span class="s">&#39;</span><span class="o">%</span><span class="n">yfile</span> <span class="o">+</span>\
+                <span class="s">&#39; --operator.obs.y.state=</span><span class="si">%s</span><span class="s">&#39;</span><span class="o">%</span><span class="nb">file</span><span class="o">+</span>\
+                <span class="s">&#39; --operator.modelt.rt_model.model_order=</span><span class="si">%d</span><span class="s"> &#39;</span><span class="o">%</span><span class="n">model_order</span> 
+
+    <span class="c"># initialise eoldas</span>
+    <span class="bp">self</span> <span class="o">=</span> <span class="n">eoldas</span><span class="o">.</span><span class="n">eoldas</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span>
+    <span class="c"># solve DA</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">write</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    
+    <span class="c"># now pull some data out of the eoldas</span>
+
+    <span class="c"># the &#39;root&#39; of the DA data structure is in self.solver.root</span>
+
+    <span class="n">root</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">root</span>
+
+    <span class="c"># The state vector data are stored in root.x</span>
+    <span class="c"># with ancillary information in root.x_meta</span>
+    <span class="c"># so the state vector is e.g. in root.x.state</span>
+    <span class="c"># and the names are in root.x_meta.state</span>
+
+    <span class="n">state_names</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">x_meta</span><span class="o">.</span><span class="n">state</span>
+    <span class="n">state</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">state</span>
+
+    <span class="c"># The sd representation of the posterior is in root.x.sd</span>
+    <span class="c"># This is all set up in eoldas_Solver.py</span>
+    <span class="c"># All storage is of type ParamStorage, an extended</span>
+    <span class="c"># dictionary structure. You can explore it interactively</span>
+    <span class="c"># with e.g. root.dict().keys() or self.keys() since</span>
+    <span class="c"># self here is a straight dictionary</span>
+    <span class="n">sd</span> <span class="o">=</span> <span class="n">root</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">sd</span>
+
+    <span class="c"># The full inverse Hessian is in self.solver.Ihessian</span>
+    <span class="n">Ihessian</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">Ihessian</span>
+
+    <span class="c"># A mask to reduce this to only the state variables</span>
+    <span class="c"># being targeted (solve == 1) is through a call to:</span>
+    <span class="n">NDVI_Ihessian</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">solver</span><span class="o">.</span><span class="n">unloader</span><span class="p">(</span><span class="bp">None</span><span class="p">,</span><span class="n">Ihessian</span><span class="p">,</span><span class="n">M</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="c"># This is of shape (365,365) here.</span>
+    <span class="c"># so now lets produce an image of it</span>
+    <span class="c"># to visualise the structure</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+    <span class="n">cax</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">NDVI_Ihessian</span><span class="p">,</span><span class="n">interpolation</span><span class="o">=</span><span class="s">&#39;nearest&#39;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s">&#39;Posterior Uncertainty matrix for NDVI&#39;</span><span class="p">)</span>
+    <span class="c"># Add colorbar, make sure to specify </span>
+    <span class="c"># tick locations to match desired ticklabels</span>
+    <span class="n">cbar</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">cax</span><span class="p">)</span> <span class="c">#), ticks=[-1, 0, 1])</span>
+    <span class="c">#cbar.ax.set_yticklabels([&#39;&lt; -1&#39;, &#39;0&#39;, &#39;&gt; 1&#39;])# vertically oriented colorbar</span>
+    <span class="c"># see http://matplotlib.sourceforge.net/plot_directive/mpl_examples/pylab_examples/colorbar_tick_labelling_demo.py</span>
+    <span class="c"># save it   </span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s">&#39;output/IHessianNDVI_expt1.png&#39;</span><span class="p">)</span>
+
+ 
+   
+ 
+
+    
+</pre></div>
+</div>
+<p>The comments in the code should be self explanatory and anyone interested
+in delving much further into the eoldas codes should see the full class
+documentation. Here, we can see at least how to access the posterior estimate
+of the state and its uncertainty. We write out the uncertainty to an image using
+matplotlib (pylab):</p>
+<img alt="images/example1plit, from ../solve_eoldas_identity.py" class="align-center" src="eoldas_release/doc/../output/IHessianNDVI_expt1.png" style="width: 700px;" />
+<p>Now, this is a very interesting figure for understanding how these multiple constraints are
+interacting. The observation uncertainty is just described by standard deviation, so lies along the leading diagonal of the <em>a priori</em> uncertainty. Further, it only exists where there are data points.
+The impact of applying the (regularisation) model constraint is to reduce the uncertainty at the
+observation points as we would expect. We can see a &#8216;sausage&#8217; pattern from above in this figure quite clearly.
+The &#8216;pinch points&#8217; are when the sample points are dense. Where there are large data gaps (from our simulated cloud impacts here) the uncertainty is higher, but it is &#8216;spread out&#8217; from the leading diagonal
+by applying temporal covariance. The impact of the filtering is large where the observation impact
+is low (or non existant). We will see these same effects in many DA experiments.</p>
+</div>
+<div class="section" id="running-eoldas-from-the-command-line">
+<h2>Running EOLDAS from the command line<a class="headerlink" href="#running-eoldas-from-the-command-line" title="Permalink to this headline">¶</a></h2>
+<p>An alternative to writing your own python code
+for the front end is to use eoldas.py, which can be direcly run from the command line.</p>
+<p>Help on command line options is available by typing::</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">eoldas_run</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">help</span>
+</pre></div>
+</div>
+<p>As an aid to setting up the correct python variables etc, a front end script, eoldas
+can also be accessed (in the bin directory).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">eoldas_run</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">conf</span><span class="o">=</span><span class="n">confs</span><span class="o">/</span><span class="n">Identity</span><span class="o">.</span><span class="n">conf</span>
+</pre></div>
+</div>
+<p>N.B. Make sure the <tt class="docutils literal"><span class="pre">eoldas_run.py</span></tt> script is in your path. If you
+install the python packages for a single user, in UNIX it will usually
+be under <tt class="docutils literal"><span class="pre">~/.local/bin/</span></tt>. You may want to add that path to your users&#8217;
+path.</p>
+<div class="section" id="application-to-modis-reflectance-data">
+<h3>Application to MODIS reflectance data<a class="headerlink" href="#application-to-modis-reflectance-data" title="Permalink to this headline">¶</a></h3>
+<p>We can now apply the concepts demonstrated above to real EO data from the MODIS sensors.</p>
+<p>This is actually quite trivial to achieve as it involves the same basic
+configuration file as previously. This time, we will access it from <tt class="docutils literal"><span class="pre">eoldas_run.py</span></tt>.</p>
+</div>
+</div>
+<div class="section" id="the-modis-data-file-format">
+<h2>The MODIS data file format<a class="headerlink" href="#the-modis-data-file-format" title="Permalink to this headline">¶</a></h2>
+<p>An example data file then is <tt class="docutils literal"><span class="pre">data/modis_botswana.dat</span></tt> which is MODIS reflectance data for a site in Botswana. The format of this file is
+&#8216;BRDF&#8217;, which looks like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">BRDF</span> <span class="mi">67</span> <span class="mi">7</span> <span class="mi">645</span> <span class="mf">858.5</span> <span class="mi">469</span> <span class="mi">555</span> <span class="mi">1240</span> <span class="mi">1640</span> <span class="mi">2130</span>  <span class="mf">0.003</span> <span class="mf">0.004</span> <span class="mf">0.004</span> <span class="mf">0.015</span> <span class="mf">0.013</span> <span class="mf">0.01</span> <span class="mf">0.006</span>
+<span class="mi">181</span> <span class="mi">1</span> <span class="mf">62.830002</span> <span class="o">-</span><span class="mf">83.040001</span> <span class="mf">37.910000</span> <span class="mf">23.219999</span> <span class="mf">0.032900</span> <span class="mf">0.068600</span> <span class="mf">0.018000</span> <span class="mf">0.028400</span> <span class="mf">0.098100</span> <span class="mf">0.097600</span> <span class="mf">0.081900</span> 
+<span class="mi">182</span> <span class="mi">1</span> <span class="mf">33.980000</span> <span class="mf">99.540001</span> <span class="mf">44.970001</span> <span class="mf">39.290001</span> <span class="mf">0.050500</span> <span class="mf">0.091800</span> <span class="mf">0.030000</span> <span class="mf">0.045300</span> <span class="mf">0.123200</span> <span class="mf">0.137100</span> <span class="mf">0.124800</span> 
+<span class="mi">184</span> <span class="mi">1</span> <span class="mf">51.660000</span> <span class="mf">99.300003</span> <span class="mf">46.889999</span> <span class="mf">42.349998</span> <span class="mf">0.056200</span> <span class="mf">0.106000</span> <span class="mf">0.029500</span> <span class="mf">0.053800</span> <span class="mf">0.151600</span> <span class="mf">0.154600</span> <span class="mf">0.141400</span> 
+<span class="mi">185</span> <span class="mi">1</span> <span class="mf">32.880001</span> <span class="o">-</span><span class="mf">81.900002</span> <span class="mf">40.540001</span> <span class="mf">31.510000</span> <span class="mf">0.039200</span> <span class="mf">0.069600</span> <span class="mf">0.022900</span> <span class="mf">0.034400</span> <span class="mf">0.089800</span> <span class="mf">0.102500</span> <span class="mf">0.092800</span> 
+<span class="mi">186</span> <span class="mi">1</span> <span class="mf">63.049999</span> <span class="mf">100.470001</span> <span class="mf">48.910000</span> <span class="mf">45.169998</span> <span class="mf">0.058200</span> <span class="mf">0.138600</span> <span class="mf">0.038900</span> <span class="mf">0.055200</span> <span class="mf">0.184600</span> <span class="mf">0.183800</span> <span class="mf">0.143100</span> 
+<span class="mi">187</span> <span class="mi">1</span> <span class="mf">6.430000</span> <span class="o">-</span><span class="mf">79.459999</span> <span class="mf">42.090000</span> <span class="mf">35.259998</span> <span class="mf">0.043700</span> <span class="mf">0.074600</span> <span class="mf">0.026400</span> <span class="mf">0.038700</span> <span class="mf">0.103100</span> <span class="mf">0.118400</span> <span class="mf">0.103600</span> 
+<span class="mi">189</span> <span class="mi">1</span> <span class="mf">22.389999</span> <span class="mf">97.720001</span> <span class="mf">43.790001</span> <span class="mf">38.750000</span> <span class="mf">0.044500</span> <span class="mf">0.088400</span> <span class="mf">0.027100</span> <span class="mf">0.040200</span> <span class="mf">0.129500</span> <span class="mf">0.135800</span> <span class="mf">0.127600</span> 
+<span class="mi">190</span> <span class="mi">1</span> <span class="mf">57.400002</span> <span class="o">-</span><span class="mf">82.720001</span> <span class="mf">38.029999</span> <span class="mf">26.480000</span> <span class="mf">0.050700</span> <span class="mf">0.087700</span> <span class="mf">0.024600</span> <span class="mf">0.045200</span> <span class="mf">0.119900</span> <span class="mf">0.118000</span> <span class="mf">0.098100</span> 
+<span class="mi">191</span> <span class="mi">1</span> <span class="mf">44.040001</span> <span class="mf">99.419998</span> <span class="mf">45.619999</span> <span class="mf">41.990002</span> <span class="mf">0.062800</span> <span class="mf">0.107800</span> <span class="mf">0.035600</span> <span class="mf">0.057100</span> <span class="mf">0.141600</span> <span class="mf">0.154800</span> <span class="mf">0.137600</span> 
+<span class="mi">192</span> <span class="mi">1</span> <span class="mf">42.689999</span> <span class="o">-</span><span class="mf">82.820000</span> <span class="mf">39.290001</span> <span class="mf">30.719999</span> <span class="mf">0.041300</span> <span class="mf">0.078800</span> <span class="mf">0.022700</span> <span class="mf">0.036600</span> <span class="mf">0.106400</span> <span class="mf">0.109000</span> <span class="mf">0.096100</span> 
+<span class="mi">193</span> <span class="mi">1</span> <span class="mf">58.139999</span> <span class="mf">99.800003</span> <span class="mf">47.560001</span> <span class="mf">45.000000</span> <span class="mf">0.063500</span> <span class="mf">0.124200</span> <span class="mf">0.034900</span> <span class="mf">0.060800</span> <span class="mf">0.169700</span> <span class="mf">0.170900</span> <span class="mf">0.143400</span> 
+<span class="mi">194</span> <span class="mi">1</span> <span class="mf">20.129999</span> <span class="o">-</span><span class="mf">82.099998</span> <span class="mf">40.730000</span> <span class="mf">34.689999</span> <span class="mf">0.038600</span> <span class="mf">0.073200</span> <span class="mf">0.024000</span> <span class="mf">0.035100</span> <span class="mf">0.106900</span> <span class="mf">0.111700</span> <span class="mf">0.105200</span> 
+<span class="mi">196</span> <span class="mi">1</span> <span class="mf">8.940000</span> <span class="mf">96.330002</span> <span class="mf">42.330002</span> <span class="mf">38.389999</span> <span class="mf">0.052200</span> <span class="mf">0.090000</span> <span class="mf">0.030300</span> <span class="mf">0.047200</span> <span class="mf">0.118400</span> <span class="mf">0.131700</span> <span class="mf">0.123100</span> 
+<span class="mi">197</span> <span class="mi">1</span> <span class="mf">62.480000</span> <span class="o">-</span><span class="mf">83.120003</span> <span class="mf">36.610001</span> <span class="mf">25.559999</span> <span class="mf">0.053800</span> <span class="mf">0.092700</span> <span class="mf">0.025000</span> <span class="mf">0.049200</span> <span class="mf">0.118100</span> <span class="mf">0.120200</span> <span class="mf">0.093200</span> 
+<span class="mi">198</span> <span class="mi">1</span> <span class="mf">34.730000</span> <span class="mf">99.230003</span> <span class="mf">44.060001</span> <span class="mf">41.840000</span> <span class="mf">0.054500</span> <span class="mf">0.103800</span> <span class="mf">0.030300</span> <span class="mf">0.051400</span> <span class="mf">0.144800</span> <span class="mf">0.147200</span> <span class="mf">0.133300</span> 
+<span class="mi">199</span> <span class="mi">1</span> <span class="mf">50.549999</span> <span class="o">-</span><span class="mf">82.849998</span> <span class="mf">37.750000</span> <span class="mf">30.030001</span> <span class="mf">0.044100</span> <span class="mf">0.082200</span> <span class="mf">0.025500</span> <span class="mf">0.041300</span> <span class="mf">0.104800</span> <span class="mf">0.114500</span> <span class="mf">0.093900</span> 
+<span class="mi">200</span> <span class="mi">1</span> <span class="mf">52.070000</span> <span class="mf">100.010002</span> <span class="mf">45.910000</span> <span class="mf">45.029999</span> <span class="mf">0.074300</span> <span class="mf">0.132000</span> <span class="mf">0.037400</span> <span class="mf">0.069800</span> <span class="mf">0.174200</span> <span class="mf">0.169700</span> <span class="mf">0.143300</span> 
+<span class="mi">201</span> <span class="mi">1</span> <span class="mf">32.130001</span> <span class="o">-</span><span class="mf">82.889999</span> <span class="mf">39.080002</span> <span class="mf">34.240002</span> <span class="mf">0.041500</span> <span class="mf">0.077000</span> <span class="mf">0.026200</span> <span class="mf">0.038900</span> <span class="mf">0.071200</span> <span class="mf">0.108400</span> <span class="mf">0.096300</span> 
+<span class="mi">202</span> <span class="mi">1</span> <span class="mf">63.400002</span> <span class="mf">100.080002</span> <span class="mf">47.880001</span> <span class="mf">48.009998</span> <span class="mf">0.082600</span> <span class="mf">0.155400</span> <span class="mf">0.043600</span> <span class="mf">0.073800</span> <span class="mf">0.191000</span> <span class="mf">0.187000</span> <span class="mf">0.137200</span> 
+<span class="mi">203</span> <span class="mi">1</span> <span class="mf">5.270000</span> <span class="o">-</span><span class="mf">76.970001</span> <span class="mf">40.590000</span> <span class="mf">38.189999</span> <span class="mf">0.053000</span> <span class="mf">0.092500</span> <span class="mf">0.026800</span> <span class="mf">0.047500</span> <span class="mf">0.122900</span> <span class="mf">0.121400</span> <span class="mf">0.109300</span> 
+<span class="mi">205</span> <span class="mi">1</span> <span class="mf">23.219999</span> <span class="mf">97.779999</span> <span class="mf">42.220001</span> <span class="mf">41.840000</span> <span class="mf">0.067000</span> <span class="mf">0.113900</span> <span class="mf">0.034600</span> <span class="mf">0.060000</span> <span class="mf">0.143100</span> <span class="mf">0.148500</span> <span class="mf">0.131800</span> 
+<span class="mi">206</span> <span class="mi">1</span> <span class="mf">56.959999</span> <span class="o">-</span><span class="mf">83.139999</span> <span class="mf">35.910000</span> <span class="mf">29.340000</span> <span class="mf">0.065800</span> <span class="mf">0.102000</span> <span class="mf">0.033800</span> <span class="mf">0.062000</span> <span class="mf">0.117800</span> <span class="mf">0.113800</span> <span class="mf">0.087400</span> 
+</pre></div>
+</div>
+<p>The first line is a header, as with the previous &#8216;PARAMETERS&#8217; format we saw.
+The first word on the header must be <tt class="docutils literal"><span class="pre">BRDF</span></tt> (a # can be included for compatitbilty with
+some other formats).</p>
+<p>The second item on the header line is the number of samples in the file (92 here). The third item is the
+number of wavebands represented (7 here) then this is followed by wavelengths, wavebands, or waveband identifiers.</p>
+<p>If a single float number is given, it is assumed to represent a narrow waveband centred around
+that wavelength. Wavelength is assumed to be in nm. If it is two float numbers connected by a dash (e.g. 45-550)
+then it is taken to be a tophat function representation of a waveband, where the two number represent
+the minimum and maximum wavelength respectively.
+If some other code is found (e.g. <tt class="docutils literal"><span class="pre">B2</span></tt>), it is assumed to be a tag associated with a particular waveband.
+In this case, any spectral libraries loaded in the configuration files are searched to see if they contain
+a definition of this waveband. If nothing is found and it cannot be interpreted as a number, it is assigned an arbitrary wavelength (index starting from 0) and should not be interpreted as a wavelength identifier.</p>
+<p>The 7 columns following the wavebands specify the standard deviation in the reflectance data.
+All subsequent lines contain reflectance, as a function of &#8216;locational&#8217;, &#8216;control&#8217; and spectral information. The first column
+here defines location (time), columns 2 to 6 are &#8216;control&#8217; variables: things the observation waries as a function of that are not
+spectral or locational. In this case, they are (all angles are in degrees):</p>
+<p># a data mask (1 for good),
+# view zenith angle,
+# view azimuth angle,
+# solar zenith angle,
+# solar azimuth angle.</p>
+<p>The final 7 columns give the reflectance in the 7 wavebands for each location defined.</p>
+<p>The data span days of year 181 to 272 inclusive. There is a lot of day to day variation in the data, but a clear
+underlying trend in the Near infrared. We will set ourselves the task of trying to use eoldas to filter the dataset
+so that the trend becomes more apparent. We will also try to extrapolate from the sample days to the whole year (which is clearly
+quite a challenge, but instructive for understanding uncertainty).</p>
+<p>We will apply the same data assimilation components as previously, i.e. an Identity operator for the NIR reflectance
+(in other words, we take the reflectance as a prior estimate of what we wish to estimate) and a regularisation filter
+implemented as a constraint on first order derivatives at lag one day. We will suppose that we know the uncertainty in this
+model (the temporal constraint) to be expressed as a standard deviation of .002 (1/500), i.e. the root mean squared deviation from
+one day to the next is expected to be around .002. An examination of the dataset will show that the NIR reflectance roughly
+increases from around 0.1 to 0.2 over about 100 days, so we could use a gamma value of 1000. However, we don&#8217;t want to impose that constraint too strongly, so we will instead use a gamma of 500. We are not trying to fit a trendline
+here, just to smooth the dataset so that we can detect the underlying behaviour. The result should however not be very sensitive to this guess and can always be explored using approaches such as cross validation.</p>
+</div>
+<div class="section" id="the-configuration-file">
+<h2>The configuration file<a class="headerlink" href="#the-configuration-file" title="Permalink to this headline">¶</a></h2>
+<p>We have a configuration file set up in <tt class="docutils literal"><span class="pre">config_files/Identity2.conf</span></tt>. This provides a full
+description of the problem we wish to solve, which is to reduce noise in the NIR observation series.</p>
+<div class="highlight-python"><pre># An EOLDAS configuration file for
+# a simple Identity operator and a regulariser
+
+[parameter]
+location = ['time']
+limits = [[1,365,1]]
+help_limits="define the limits for the required locational information"
+names = "gamma_time 858.5".split()
+solve = 0,1
+datatypes = x
+
+[parameter.result]
+filename = output/Identity/MODIS_botswana.params
+format = 'PARAMETERS'
+help_filename='Set the output state filename'
+
+[parameter.x]
+datatype = x
+names = $parameter.names
+default = 500,0.1
+state= data/modis_botswana.dat
+help_default="Set the default values of the states"
+apply_grid = True
+sd = [1.]*len($parameter.names)
+bounds =  [[0.000001,1000000],[0,1]]
+
+[general]
+doplot=True
+help_do_plot='do plotting'
+calc_posterior_unc=False
+
+[operator]
+modelt.name=DModel_Operator
+modelt.datatypes = x
+obs.name=Operator
+obs.datatypes = x,y
+
+[operator.modelt.x]
+names = $parameter.names
+sd = [1.0]*len($operator.modelt.x.names)
+datatype = x
+
+[operator.modelt.rt_model]
+model_order=1
+help_model_order='The differential model order'
+wraparound=periodic,365
+#wraparound=None
+
+[operator.obs.x]
+names = $parameter.names[1:]
+sd = [1.0]*len($operator.obs.x.names)
+help_sd='Set the observation sd'
+datatype = x
+
+[operator.obs.y]
+control = [mask,vza,vaa,sza,saa]
+names = $parameter.names[1:]
+sd = [0.015]*len($operator.obs.x.names)
+#help_sd="set the sd for the observations"
+datatype = y
+state = data/modis_botswana.dat
+help_state = "Set the y state vector"
+
+[operator.obs.y.result]
+filename = output/Identity/Botswana_fwd.params
+format = 'PARAMETERS'
+help_filename = 'Set the fwd modelling result filename'
+
+
+
+</pre>
+</div>
+<p>In this, we can see the required location field defined in the <tt class="docutils literal"><span class="pre">[parameters]</span></tt> section (i.e. <tt class="docutils literal"><span class="pre">parameters.location=[[1,365,1]]</span></tt>).
+The control variables are associated with  the observation operator, here given as <tt class="docutils literal"><span class="pre">[mask,vza,vaa,sza,saa]</span></tt>.</p>
+<p>To run eoldas with this configuration then all we need do is type:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">eoldas_run</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">conf</span><span class="o">=</span><span class="n">config_files</span><span class="o">/</span><span class="n">eoldas_config</span><span class="o">.</span><span class="n">conf</span> \
+  <span class="o">--</span><span class="n">conf</span><span class="o">=</span><span class="n">config_files</span><span class="o">/</span><span class="n">Identity2</span><span class="o">.</span><span class="n">conf</span> <span class="o">--</span><span class="n">calc_posterior_unc</span>
+</pre></div>
+</div>
+<p>This writes the files:</p>
+<p><tt class="docutils literal"><span class="pre">output/Identity/MODIS_botswana.params</span></tt>: state estimation (smoothed reflectance)</p>
+<p><tt class="docutils literal"><span class="pre">output/Identity/Botswana_fwd.params</span></tt>: forward modelling of y</p>
+<p>as well as the orignal data in <tt class="docutils literal"><span class="pre">output/Identity/Botswana_fwd.params_orig</span></tt></p>
+<p>with appropriate graphics for the state:</p>
+<img alt="eoldas_release/doc/../output/Identity/MODIS_botswana.params.plot.x.png" src="eoldas_release/doc/../output/Identity/MODIS_botswana.params.plot.x.png" />
+<p>and the y data:</p>
+<img alt="eoldas_release/doc/../output/Identity/Botswana_fwd.params.plot.y2.png" src="eoldas_release/doc/../output/Identity/Botswana_fwd.params.plot.y2.png" />
+<img alt="eoldas_release/doc/../output/Identity/Botswana_fwd.params.plot.x.png" src="eoldas_release/doc/../output/Identity/Botswana_fwd.params.plot.x.png" />
+<p>The resultant state data are quite instructive: where we have observations, the uncertainty
+is reduced from 0.015 to around 0.004 (the actual degree of noise reduction
+depends on the value of gamma used). Where there are no data, the uncertainty
+grows to around 0.017. It is slightly reduced at the year start/end because of the wrparound condition used here.</p>
+<p>In this case, we have used a first order differential constraint with a periodic boundary condition. These
+are quite important in this case: we only have observations in a limited time window, so using a periodic
+boundary condition is one way to place some form of constraint at what happens when we have no data. The
+first order differential model will in essence perform a linear interpolation where there are no data, which is
+probably appropriate for this case. You can try changing the model order to see what happens. Run e.g.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">eoldas_run</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">conf</span><span class="o">=</span><span class="n">config_files</span><span class="o">/</span><span class="n">eoldas_config</span><span class="o">.</span><span class="n">conf</span> \
+  <span class="o">--</span><span class="n">conf</span><span class="o">=</span><span class="n">config_files</span><span class="o">/</span><span class="n">Identity2</span><span class="o">.</span><span class="n">conf</span> <span class="o">--</span><span class="n">calc_posterior_unc</span> \
+  <span class="o">--</span><span class="n">operator</span><span class="o">.</span><span class="n">modelt</span><span class="o">.</span><span class="n">rt_model</span><span class="o">.</span><span class="n">model_order</span><span class="o">=</span><span class="mi">2</span> \
+  <span class="o">--</span><span class="n">parameter</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">default</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span><span class="mf">0.1</span> \
+  <span class="o">--</span><span class="n">operator</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">filename</span><span class="o">=</span><span class="n">output</span><span class="o">/</span><span class="n">Identity</span><span class="o">/</span><span class="n">Botswana_fwd</span><span class="o">.</span><span class="n">params2</span> \
+  <span class="o">--</span><span class="n">parameter</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">filename</span><span class="o">=</span><span class="n">output</span><span class="o">/</span><span class="n">Identity</span><span class="o">/</span><span class="n">MODIS_botswana</span><span class="o">.</span><span class="n">params2</span>
+</pre></div>
+</div>
+<p>and have a look at <tt class="docutils literal"><span class="pre">output/Identity/MODIS_botswana.params2.plot.x.png</span></tt>:</p>
+<img alt="eoldas_release/doc/../output/Identity/MODIS_botswana.params2.plot.x.png" src="eoldas_release/doc/../output/Identity/MODIS_botswana.params2.plot.x.png" />
+<p>The assumed behaviour is quite different to the first order differential constraint outside of the observations. With a high value of gamma, the result is essentially a straight line where there are observations.
+The influence of the wraparound condition is also clear here.</p>
+<p>If we used a lower gamma, we would see some features of using a second order model:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">eoldas_run</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">conf</span><span class="o">=</span><span class="n">config_files</span><span class="o">/</span><span class="n">eoldas_config</span><span class="o">.</span><span class="n">conf</span> \
+  <span class="o">--</span><span class="n">conf</span><span class="o">=</span><span class="n">config_files</span><span class="o">/</span><span class="n">Identity2</span><span class="o">.</span><span class="n">conf</span> <span class="o">--</span><span class="n">calc_posterior_unc</span> \
+  <span class="o">--</span><span class="n">operator</span><span class="o">.</span><span class="n">modelt</span><span class="o">.</span><span class="n">rt_model</span><span class="o">.</span><span class="n">model_order</span><span class="o">=</span><span class="mi">2</span> \
+  <span class="o">--</span><span class="n">parameter</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">default</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span><span class="mf">0.1</span>  \
+  <span class="o">--</span><span class="n">operator</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">filename</span><span class="o">=</span><span class="n">output</span><span class="o">/</span><span class="n">Identity</span><span class="o">/</span><span class="n">Botswana_fwd</span><span class="o">.</span><span class="n">params3</span>  \
+  <span class="o">--</span><span class="n">parameter</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">filename</span><span class="o">=</span><span class="n">output</span><span class="o">/</span><span class="n">Identity</span><span class="o">/</span><span class="n">MODIS_botswana</span><span class="o">.</span><span class="n">params3</span>
+</pre></div>
+</div>
+<img alt="eoldas_release/doc/../output/Identity/MODIS_botswana.params3.plot.x.png" src="eoldas_release/doc/../output/Identity/MODIS_botswana.params3.plot.x.png" />
+<p>Where there are observations, the second order difference constraint would have high frequency oscillations. This can be a positive feature or an annoyance: it all depends on how you expect the function to behave. It is
+not an arbitrary choice: the user has imposed a particular expectation of behaviour here through the model. There clearly needs to be some evidence for choosing one form of model over another, although that is not always straightforward.</p>
+<p>One other interesting feature of this result is that the mean estimate is bounded (0.0,1.0) which is reasonable for reflectance data (theoretically, BRF can go above 1, but this is rarely observed). This means that the mean value (the red line) is forced to stay above 0 (days 100 to 150) even though the apparent trend from the observations might otherwise make it go below zero. This condition is imposed in the configuration by the line:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">bounds</span> <span class="o">=</span>  <span class="p">[[</span><span class="mf">0.000001</span><span class="p">,</span><span class="mi">1000000</span><span class="p">],[</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">]]</span>
+</pre></div>
+</div>
+<p>One further thing to note about this result is that when the uncertainty is so large (as is the case here when we are extrapolating) that the confidence interval spans more than the entire data range (0,1) the mean and standard deviation described in the Gaussian statistics are a little meaningless or at least should be interpreted with caution. It might in this case be better to describe the data (in the extrapolated region) as simply being somewhere between the physical limits.</p>
+<p>A final comment is that actually, a large amount of the departure of the signal from our smooth trajectory, the high frequency variation that we have treated as noise here, can most likely be described by considering the physics os scattering by the surface (there are, on the whole, BRDF effects). We will return to this later.</p>
+<p>As well as raising a few issues with regard to model selection, we have demonstrated further use of the eoldas command line for quickly changing some terms in an experiment.
+However, it is all very well in showing that eoldas can ingest satellite data and
+apply constraints to provide an estimate of state variables, but the
+state variables here (reflectance) do not directly help us monitor the
+properties of the land surface or link to process models.</p>
+<p>To do that using EO data, we generally need more complex obeseravtion operators. These are dealt with in the next section.</p>
+</div>
+</div>
+
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        <a class="uplink" href="../../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, P Lewis and J Gomez-Dans.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
