@@ -1,0 +1,198 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>EOLDAS examples &mdash; EOLDAS Users&#39; Guide 2012.06 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/print.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '2012.06',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="../_static/theme_extras.js"></script>
+    <link rel="top" title="EOLDAS Users&#39; Guide 2012.06 documentation" href="../index.html" /> 
+  </head>
+  <body>
+      <div class="header">
+        <a href="../index.html">
+          <img class="logo" src="../_static/eoldas_logos.png" alt="Logo"/>
+        </a>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        <a class="uplink" href="../index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="eoldas-examples">
+<h1>EOLDAS examples<a class="headerlink" href="#eoldas-examples" title="Permalink to this headline">¶</a></h1>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><a class="reference internal" href="#installation" id="id3">Installation</a><ul>
+<li><a class="reference internal" href="#installing-the-example-files-using-git" id="id4">Installing the example files using git</a><ul>
+<li><a class="reference internal" href="#installing-from-the-zip-file" id="id5">Installing from the Zip file</a></li>
+<li><a class="reference internal" href="#cloning-the-repository" id="id6">Cloning the repository</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#experiment-1-savitzky-golay-smoothing" id="id7">Experiment 1 ( Savitzky-Golay smoothing)</a></li>
+<li><a class="reference internal" href="#experiment-2-eoldas-with-an-identity-operator" id="id8">Experiment 2 (EOLDAS with an identity operator)</a></li>
+<li><a class="reference internal" href="#experiment-3-smoothing-of-modis-observations" id="id9">Experiment 3 (smoothing of MODIS observations)</a></li>
+<li><a class="reference internal" href="#experiment-4-rt-observation-operators" id="id10">Experiment 4 (RT observation operators )</a></li>
+<li><a class="reference internal" href="#experiment-5-time-series-assimilation-using-observation-operator" id="id11">Experiment 5 (time series assimilation using observation operator )</a><ul>
+<li><a class="reference internal" href="#experiment-5-1" id="id12">Experiment 5.1</a></li>
+<li><a class="reference internal" href="#experiment-5-2" id="id13">Experiment 5.2</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="installation">
+<h2><a class="toc-backref" href="#id3">Installation</a><a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>This repository holds the code and ancillary files that are required to run the
+examples in the <a class="reference external" href="http://www2.geog.ucl.ac.uk/~plewis/eoldas/index.html">EOLDAS user&#8217;s guide</a>.</p>
+<p>However, we first need to install EOLDAS and any other modules that are required
+(in this case, RT codes that are distributed as independent packages). This is
+straightforward, as all these packages are python packages that can be installed
+using either <tt class="docutils literal"><span class="pre">easy_install</span></tt> or <tt class="docutils literal"><span class="pre">pip</span></tt>. The installation will download and
+install both the eoldas package, and the required RT packages. These will be
+compiled and installed (there will be lots of compiler warning errors. These are
+normal and you should ignore them). To install using <tt class="docutils literal"><span class="pre">easy_install</span></tt> do</p>
+<p>easy_install -U eoldas &#8211;user</p>
+<p>This will install things in <tt class="docutils literal"><span class="pre">~/.local/lib</span></tt> and <tt class="docutils literal"><span class="pre">~/.local/bin</span></tt>.
+The latter might be added to your <tt class="docutils literal"><span class="pre">$PATH</span></tt> to gain access to the main
+executable file, <tt class="docutils literal"><span class="pre">eoldas_run.py</span></tt>.</p>
+<p>Installation using pip is also possible</p>
+<p>pip install eoldas</p>
+<p>Note that a number of auxiliary packages are required. These are
+usually available from a complete python installation and are:</p>
+<ul class="simple">
+<li>numpy</li>
+<li>scipy</li>
+<li>matplotlib</li>
+</ul>
+<p>The optimisation package <a class="reference external" href="http://openopt.org/">OpenOpt</a> is not
+required, but allows more flexibility in the choice of optimisation
+methods.</p>
+<div class="section" id="installing-the-example-files-using-git">
+<h3><a class="toc-backref" href="#id4">Installing the example files using git</a><a class="headerlink" href="#installing-the-example-files-using-git" title="Permalink to this headline">¶</a></h3>
+<p>The examples from the user&#8217;s guide have been revamped. All the files (config and ancillary data files) are in <em>this</em> github repository. Once the above are all installed, you can either download them or <em>clone the repository using git</em>. The latter method is recommended, so you can track changes etc.</p>
+<div class="section" id="installing-from-the-zip-file">
+<h4><a class="toc-backref" href="#id5">Installing from the Zip file</a><a class="headerlink" href="#installing-from-the-zip-file" title="Permalink to this headline">¶</a></h4>
+<p>Click on the icon that says &#8220;ZIP&#8221; towards the top left of the page), unzip the resulting file somewhere, and run the examples from this new directory.</p>
+</div>
+<div class="section" id="cloning-the-repository">
+<h4><a class="toc-backref" href="#id6">Cloning the repository</a><a class="headerlink" href="#cloning-the-repository" title="Permalink to this headline">¶</a></h4>
+<p>Make sure you have a recent version of git installed, then do</p>
+<p>git clone <a class="reference external" href="https://github.com/jgomezdans/eoldas_examples.git">https://github.com/jgomezdans/eoldas_examples.git</a></p>
+<p>If you plan to contribute to the codebase, it&#8217;s recommended that you fork the repository (see <a class="reference external" href="https://help.github.com/articles/fork-a-repo">here for more information</a></p>
+</div>
+</div>
+</div>
+<div class="section" id="experiment-1-savitzky-golay-smoothing">
+<h2><a class="toc-backref" href="#id7">Experiment 1 ( Savitzky-Golay smoothing)</a><a class="headerlink" href="#experiment-1-savitzky-golay-smoothing" title="Permalink to this headline">¶</a></h2>
+<p>The first example (in  <cite>here &lt;http://www2.geog.ucl.ac.uk/~plewis/eoldas/eoldas_guide.html&gt;&#8217;_) runs a Savitzky-Golay filter over some MODIS NDVI data. The script is ``savitzy_golay.py`</cite>, and it requires the file <tt class="docutils literal"><span class="pre">data/FuentesAndalucia_MOD09A1.txt</span></tt> that holds the data. You run the script by issuing the command <tt class="docutils literal"><span class="pre">python</span> <span class="pre">savitzky_golay.py</span></tt>. This will pop a window, that when closed will save the plot to the images directory (this directory will be created if it doesn&#8217;t exist). This plot should correspond to <a class="reference external" href="http://www2.geog.ucl.ac.uk/~plewis/eoldas/_images/golay.png">this one</a></p>
+</div>
+<div class="section" id="experiment-2-eoldas-with-an-identity-operator">
+<h2><a class="toc-backref" href="#id8">Experiment 2 (EOLDAS with an identity operator)</a><a class="headerlink" href="#experiment-2-eoldas-with-an-identity-operator" title="Permalink to this headline">¶</a></h2>
+<p>This experiment is described in depth in <a class="reference external" href="http://www2.geog.ucl.ac.uk/~plewis/eoldas/example1.html">here</a>. It requires two configuration files, stored in config_files: <tt class="docutils literal"><span class="pre">Identity.conf</span></tt> and <tt class="docutils literal"><span class="pre">eoldas_config.conf</span></tt>. It also requires a datafile in <tt class="docutils literal"><span class="pre">data/Identity/random_ndvi1.dat</span></tt>. The script that uses these files is <tt class="docutils literal"><span class="pre">solve_eoldas_identity.py</span></tt>. The script is executed with the command <tt class="docutils literal"><span class="pre">python</span> <span class="pre">solve_eoldas_identity.py</span></tt>. After running this, the script will create a number of directories to store logs (<tt class="docutils literal"><span class="pre">mylogs/</span></tt>), solutions and further diagnostics (these will be under <tt class="docutils literal"><span class="pre">output/Identity/</span></tt>). The results should correspond to figures in the user&#8217;s guide.</p>
+<p>An extra script is provided in <a class="reference external" href="http://www2.geog.ucl.ac.uk/~plewis/eoldas/example1.html#example-plotting-data-from-the-output-files">here</a>. This shows how to make plots of the output using Python and Matplotlib. The required script is <tt class="docutils literal"><span class="pre">example1plot.py</span></tt>. This script will produce a plot stored under the <tt class="docutils literal"><span class="pre">images</span></tt> directory. It should be compared to the one on the user&#8217;s manual. Similarly for <tt class="docutils literal"><span class="pre">solve_eoldas_identity1.py</span></tt>, you can use <tt class="docutils literal"><span class="pre">example1plot1.py</span></tt> to plot figures simular to those in the user&#8217;s guide. Similarly, you can try <tt class="docutils literal"><span class="pre">solve_eoldas_identity2.py</span></tt> and <tt class="docutils literal"><span class="pre">example1plot2.py</span></tt>.</p>
+<p>To plot the Hessian, as in <a class="reference external" href="http://www2.geog.ucl.ac.uk/~plewis/eoldas/example1.html#interfacing-a-little-more-deeply-with-the-eoldas-code">here</a>, you can use the script <tt class="docutils literal"><span class="pre">solve_eoldas_identity_a.py</span></tt>. It will save the plot in <tt class="docutils literal"><span class="pre">output/IHessianNDVI_expt1.png</span></tt>.</p>
+</div>
+<div class="section" id="experiment-3-smoothing-of-modis-observations">
+<h2><a class="toc-backref" href="#id9">Experiment 3 (smoothing of MODIS observations)</a><a class="headerlink" href="#experiment-3-smoothing-of-modis-observations" title="Permalink to this headline">¶</a></h2>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">The command line is slightly changed from that in the user&#8217;s guide  (assuming you have  <tt class="docutils literal"><span class="pre">~/.local/bin/</span></tt> in your <tt class="docutils literal"><span class="pre">$PATH</span></tt>. If that&#8217;s not the case, prepend it to the command line)</p>
+</div>
+<p>The <a class="reference external" href="http://www2.geog.ucl.ac.uk/~plewis/eoldas/example1a.html">third experiment</a> requires some real MODIS observations. These are given in <tt class="docutils literal"><span class="pre">data/modis_botswana.dat</span></tt>. You will also require the configuration file <tt class="docutils literal"><span class="pre">config_files/Identity2.conf</span></tt>. To produce all the plots in this section, you will need to have the <tt class="docutils literal"><span class="pre">eoldas_run.py</span></tt> executable in your path (this will usually be <tt class="docutils literal"><span class="pre">~/.local/bin/</span></tt>).</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">eoldas_run</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">conf</span><span class="o">=</span><span class="n">config_files</span><span class="o">/</span><span class="n">eoldas_config</span><span class="o">.</span><span class="n">conf</span> <span class="o">--</span><span class="n">conf</span><span class="o">=</span><span class="n">config_files</span><span class="o">/</span><span class="n">Identity2</span><span class="o">.</span><span class="n">conf</span> <span class="o">--</span><span class="n">calc_posterior_unc</span>
+</pre></div>
+</div>
+<p>The output of this experiment will come out in <tt class="docutils literal"><span class="pre">output/Identity</span></tt> (with names such as <tt class="docutils literal"><span class="pre">Botswana_fwd.params2.plot.y.png</span></tt> or <tt class="docutils literal"><span class="pre">NDVI_Identity1.params.plot.x.png</span></tt>)
+To run the other examples, do</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">eoldas_run</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">conf</span><span class="o">=</span><span class="n">config_files</span><span class="o">/</span><span class="n">eoldas_config</span><span class="o">.</span><span class="n">conf</span> <span class="o">--</span><span class="n">conf</span><span class="o">=</span><span class="n">config_files</span><span class="o">/</span><span class="n">Identity2</span><span class="o">.</span><span class="n">conf</span> <span class="o">--</span><span class="n">calc_posterior_unc</span> <span class="o">--</span><span class="n">operator</span><span class="o">.</span><span class="n">modelt</span><span class="o">.</span><span class="n">rt_model</span><span class="o">.</span><span class="n">model_order</span><span class="o">=</span><span class="mi">2</span> <span class="o">--</span><span class="n">parameter</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">default</span><span class="o">=</span><span class="mi">5000</span><span class="p">,</span><span class="mf">0.1</span> <span class="o">--</span><span class="n">operator</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">filename</span><span class="o">=</span><span class="n">output</span><span class="o">/</span><span class="n">Identity</span><span class="o">/</span><span class="n">Botswana_fwd</span><span class="o">.</span><span class="n">params2</span> <span class="o">--</span><span class="n">parameter</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">filename</span><span class="o">=</span><span class="n">output</span><span class="o">/</span><span class="n">Identity</span><span class="o">/</span><span class="n">MODIS_botswana</span><span class="o">.</span><span class="n">params2</span>
+<span class="n">eoldas_run</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">conf</span><span class="o">=</span><span class="n">config_files</span><span class="o">/</span><span class="n">eoldas_config</span><span class="o">.</span><span class="n">conf</span> <span class="o">--</span><span class="n">conf</span><span class="o">=</span><span class="n">config_files</span><span class="o">/</span><span class="n">Identity2</span><span class="o">.</span><span class="n">conf</span> <span class="o">--</span><span class="n">calc_posterior_unc</span> <span class="o">--</span><span class="n">operator</span><span class="o">.</span><span class="n">modelt</span><span class="o">.</span><span class="n">rt_model</span><span class="o">.</span><span class="n">model_order</span><span class="o">=</span><span class="mi">2</span> <span class="o">--</span><span class="n">parameter</span><span class="o">.</span><span class="n">x</span><span class="o">.</span><span class="n">default</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span><span class="mf">0.1</span> <span class="o">--</span><span class="n">operator</span><span class="o">.</span><span class="n">obs</span><span class="o">.</span><span class="n">y</span><span class="o">.</span><span class="n">result</span><span class="o">.</span><span class="n">filename</span><span class="o">=</span><span class="n">output</span><span class="o">/</span><span class="n">Identity</span><span class="o">/</span><span class="n">Botswana</span>
+</pre></div>
+</div>
+<p>Check the actual command line to see where output results are going to come out.</p>
+</div>
+<div class="section" id="experiment-4-rt-observation-operators">
+<h2><a class="toc-backref" href="#id10">Experiment 4 (RT observation operators )</a><a class="headerlink" href="#experiment-4-rt-observation-operators" title="Permalink to this headline">¶</a></h2>
+<p>Radiative transfer modelling for optical remote sensing. In <a class="reference external" href="http://www2.geog.ucl.ac.uk/~plewis/eoldas/example2.html">this experiment</a>, we will use the semidiscrete model to invert and forward model real observations from spaceborne sensors. The first experiment gets a single observation from MERIS (15 bands in the visible/near-infrared range), and inverts this observation. The command to run it is:</p>
+<div class="highlight-python"><pre>~/.local/bin/eoldas_run.py --conf=config_files/eoldas_config.conf --conf=config_files/meris_single.conf --parameter.limits='[[232,232,1]]' --calc_posterior_unc</pre>
+</div>
+<p>The solution will appear in <tt class="docutils literal"><span class="pre">output/meris/</span></tt>, where you can find both the text files and plots that are in the users&#8217; guide.</p>
+<p>A second example uses the results from the first, and uses the estimated state of the land surface to provide a prediction of the reflectance that would be seen by the MODIS sensor on that same day. This is then compared to the actual observations. The command is</p>
+<div class="highlight-python"><pre>~/.local/bin/eoldas_run.py --conf=config_files/eoldas_config.conf --conf=config_files/meris_single.conf --parameter.limits='[[232,232,1]]' --passer --conf=config_files/modis_single.conf</pre>
+</div>
+<p>Other experiments in that section are:</p>
+<div class="highlight-python"><pre>~/.local/bin/eoldas_run.py --conf=config_files/eoldas_config.conf --conf=config_files/meris_single.conf --parameter.limits='[[232,232,1]]' --passer --conf=config_files/modis_single_a.conf</pre>
+</div>
+<p>(the output for this will be in e.g. <tt class="docutils literal"><span class="pre">output/modis/MODIS_WW_1_A_1.fwd_a.plot.y.png</span></tt>). The following experiment will be</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">eoldas_run</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">conf</span><span class="o">=</span><span class="n">config_files</span><span class="o">/</span><span class="n">eoldas_config</span><span class="o">.</span><span class="n">conf</span> <span class="o">--</span><span class="n">conf</span><span class="o">=</span><span class="n">config_files</span><span class="o">/</span><span class="n">meris_single</span><span class="o">.</span><span class="n">conf</span> <span class="o">--</span><span class="n">parameter</span><span class="o">.</span><span class="n">limits</span><span class="o">=</span><span class="s">&#39;[[232,232,1]]&#39;</span> <span class="o">--</span><span class="n">conf</span><span class="o">=</span><span class="n">config_files</span><span class="o">/</span><span class="n">modis_single_b</span><span class="o">.</span><span class="n">conf</span>
+</pre></div>
+</div>
+<p>Output for MERIS will be in eg <tt class="docutils literal"><span class="pre">output/meris/MERIS_WW_1_A_1.fwd_b.plot.y.png</span></tt> whereas for MODIS it will be in <tt class="docutils literal"><span class="pre">output/modis/MODIS_WW_1_A_1.fwd_b.plot.y.png</span></tt></p>
+<p>The experiment that demonstrates changing the prior definition is run like</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">eoldas_run</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">conf</span><span class="o">=</span><span class="n">config_files</span><span class="o">/</span><span class="n">eoldas_config</span><span class="o">.</span><span class="n">conf</span> <span class="o">--</span><span class="n">conf</span><span class="o">=</span><span class="n">config_files</span><span class="o">/</span><span class="n">meris_single</span><span class="o">.</span><span class="n">conf</span> <span class="o">--</span><span class="n">parameter</span><span class="o">.</span><span class="n">limits</span><span class="o">=</span><span class="s">&#39;[[232,232,1]]&#39;</span> <span class="o">--</span><span class="n">conf</span><span class="o">=</span><span class="n">config_files</span><span class="o">/</span><span class="n">modis_single_c</span><span class="o">.</span><span class="n">conf</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="experiment-5-time-series-assimilation-using-observation-operator">
+<h2><a class="toc-backref" href="#id11">Experiment 5 (time series assimilation using observation operator )</a><a class="headerlink" href="#experiment-5-time-series-assimilation-using-observation-operator" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="experiment-5-1">
+<h3><a class="toc-backref" href="#id12">Experiment 5.1</a><a class="headerlink" href="#experiment-5-1" title="Permalink to this headline">¶</a></h3>
+<p>This experiment is the same as in the webpage, but with different initialisation methods, prior ranges etc. We hope to expand the user&#8217;s guide with more comment. The experiment is contained in a single python script, <tt class="docutils literal"><span class="pre">modisDa0.py</span></tt>, and can be executed by calling it as <tt class="docutils literal"><span class="pre">python</span> <span class="pre">modisDa0.py</span></tt>.</p>
+</div>
+<div class="section" id="experiment-5-2">
+<h3><a class="toc-backref" href="#id13">Experiment 5.2</a><a class="headerlink" href="#experiment-5-2" title="Permalink to this headline">¶</a></h3>
+<p>The current experiment expands on the previous experiments by demonstrating how the smoothing constraint is applied to a problem where a complex observation operator is used to model the observations. The details of this experiment are <a class="reference external" href="http://www2.geog.ucl.ac.uk/~plewis/eoldas/example3.html">in this page</a> . The first example can be performed by the following command (it takes around 30-45 minutes):</p>
+<div class="highlight-python"><pre>~/.local/bin/eoldas_run.py --conf=config_files/eoldas_config.conf --conf=config_files/semid_default.conf --logfile=logs/file.log --parameter.result.filename=output/gamma2/state.dat --operator.obs.y.result.filename=output/gamma2/obs.dat --parameter.x.default=2,0.99,5,0.01,0.99,0.001,0.99,0.35,1.5,1,0.001,0,0,5 --operator.obs.y.state=data/brdf_WW_1_A_1.kernelFiltered.dat</pre>
+</div>
+<p>You will see results appearing in <tt class="docutils literal"><span class="pre">output/gamma2</span></tt>. In particular, the state that we are solving for appears in <tt class="docutils literal"><span class="pre">output/gamma2/state.dat.plot.x.png</span></tt> (for the plot) and <tt class="docutils literal"><span class="pre">output/gamma2/state.dat</span></tt> for the raw data. Also note that in this example, the posterior covariance matrix and Hessian have not been calculated.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Here&#8217;s where the hack to do several different gammas starting from a previous gamma needs to go.</p>
+</div>
+</div>
+</div>
+</div>
+
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        <a class="uplink" href="../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, P Lewis and J Gomez-Dans.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
