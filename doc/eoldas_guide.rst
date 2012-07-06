@@ -200,10 +200,8 @@ series. Recently, the Savitzky-Golay filter has been widely employed to smoooth
 timeseries of vegetation indices. The figure shows an example of the original 
 and filtered versions of the output.
 
-.. image:: scripts/savitzky_golay.png
    
-   
-.. plot:: scripts/savitzky_golay.py
+.. plot:: ../savitzky_golay.py
 
 
 Note that the filtering relies on specifying its characteristics: what

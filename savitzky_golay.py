@@ -76,7 +76,7 @@ def savitzky_golay(y, window_size, order, deriv=0):
 
 
 if __name__ == "__main__":
-    mod_ref =  np.loadtxt("../data/FuentesAndalucia_MOD09A1.txt", delimiter=";")
+    mod_ref =  np.loadtxt("data/FuentesAndalucia_MOD09A1.txt", delimiter=";")
     ndvi = (mod_ref[:,8] - mod_ref[:,7])/(mod_ref[:,8]+mod_ref[:,7])
     plt.plot ( ndvi, 'k-', label="MOD09 NDVI")
     ndvi_smooth = savitzky_golay(ndvi, window_size=11, order=2)
@@ -84,5 +84,4 @@ if __name__ == "__main__":
     plt.legend(loc='best' )
     plt.grid ( True ) 
     plt.show()
-    plt.savefig('images/golay.png')
 

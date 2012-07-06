@@ -46,7 +46,7 @@ extensions = [
         'sphinx.ext.extlinks',
 ]
 
-jsmath_path="_static/jsMath/easy/load.js"
+#jsmath_path="_static/jsMath/easy/load.js"
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['.templates']
 
