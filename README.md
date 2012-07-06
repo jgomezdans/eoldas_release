@@ -1,2 +1,0 @@
-eoldas_release
-==============
