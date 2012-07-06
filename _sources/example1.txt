@@ -57,15 +57,7 @@ partly to make sure that a record exists of a particular experimental setup
 and partly to allow flexible running of the system without the need for further coiding by the
 user (unless he/she wants to add new classes or methods).
 
-<<<<<<< HEAD
 Here is the start of the `configuration file <https://github.com/jgomezdans/eoldas_release/blob/master/config_files/Identity.conf>`_ that we are
-=======
-<<<<<<< HEAD
-Here is the start of the `configuration file <https://github.com/jgomezdans/eoldas_release/blob/master/config_files/Identity.conf>`_ that we are
-=======
-Here is the start of the `configuration file <config_files/Identity.conf>`_ that we are
->>>>>>> ce76b11e7d7c668d4c215d915da12acce164f84b
->>>>>>> 3a432b04f6092097d0eb5bd053d645c54dd0114e
 going to use:
 
 .. literalinclude:: ../config_files/Identity.conf
