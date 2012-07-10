@@ -144,3 +144,18 @@ You will see results appearing in ``output/gamma2``. In particular, the state th
 .. note::
    
    Here's where the hack to do several different gammas starting from a previous gamma needs to go.
+
+
+Experiment 6
+=============
+
+This forms part of the Sentinel experiment from  Lewis et al. (2012).
+
+To run: ::
+
+    eoldas_run.py --conf=config_files/eoldas_config.conf --conf=config_files/sentinel.conf --logfile=logs/file1.log
+
+In ``config_files/sentinel.conf``, we initialise state using the file ``data/rse1_init.dat`` (to spped things up here). The synthetic Sentinel-2 MSI observations are in the file `data/rse1_test.100.dat`.
+
+You can view the results as they process in e.g. ``output/rse1/rse1_test.dat.plot.x.png``.
+
