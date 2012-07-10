@@ -1,5 +1,5 @@
 import numpy as np
-import eoldaslib as eoldas
+import eoldas
 import sys,tempfile
 import os
 
@@ -16,8 +16,8 @@ priorsd = ''.join(['0.33'] + [',0.33']*(len(names.split(','))-2))
 #default = '%f,0.99,5,0.01,0.5,0.001,0.5,0.35,1.5,1,0.001,0,0,5'%gamma
 
 cmd = 'eoldas ' +  \
-                '--conf=system_confs/eoldas_config.conf  ' + \
-                '--conf=confs/semid_default.conf ' + \
+                '--conf=config_files/eoldas_config.conf  ' + \
+                '--conf=config_files/semid_default.conf ' + \
                 '--parameter.x.default=%s '%default + \
                 '--parameter.solve=0,1,0,0,1,1,1,1,1,1,1,0,0,0 ' +\
                 '--logfile=logs/file.log ' + \
