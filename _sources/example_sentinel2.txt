@@ -121,15 +121,125 @@ out files, and also runs the eoldas prototype as required. As mentioned
 above, we use the `pyephem <http://rhodesmill.org/pyephem/>`_ package 
 to simulate the solar geometry.
 
-Simulating the acquisition geometry
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Generating the synthetic observations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Solar calculations are performed in the ``fwdModel`` method of 
-``Sentinel``:
+The code for this is fairly simple, and can be seen in the ``main``
+function in ``sentinel.py``:
 
 .. literalinclude:: ../sentinel.py
    :language: python
-   :lines: 256-260
+   :lines: 892-900
+   
+We first instantiate the ``Sentinel`` class, calculate the parameter
+temporal trajectories using the ``Sentinel.parameters`` method. This
+requires a time axis as well as an output file (in this case, 
+``input/truth.dat``. This file can also be used to compare inversion
+results etc.). Once the parameter trajectories have been established,
+we can forward model them to surface reflectance using the ``Sentinel.fwdModel``
+method. This method has a number of options that are important to note:
 
-We assume that the satellite overpass is 10:30 local time, and give 
-a suitable longitude and latitude.
+``ifile``    
+    input data (parameters) file
+``ofile``
+    output reflectance data file
+``lat``
+    latitude (default '50:0') (see ephem)
+``lon``
+    longitude (default ''0:0') (see ephem)
+``year``
+    as int or string (default '2011')
+``maxVza``     
+    maximum view zenith angle assumed (15 degrees default)
+``minSD``      
+    minimum noise
+``maxSD`` 
+    maximum noise. The uncertainty in each waveband is scaled linearly with wavelength between minSD and maxSD 
+``fullBand``   
+    set True if you want full band pass else False (default False). Note that its much slower to set this True.
+``confFile``  
+    configuration file (default ``config_files/sentinel0.conf``). If this file doesnt exist, it will be generated from ``self.confTxt``. If that doesn't exist, ``self.generateConfTxt()``  is invoked to provide a default.
+``every``     
+    sample output every 'every' doys (default 5)
+``prop``       
+    proportion of clear sample days (default 1.0)
+``WINDOW``     
+    size of smoothing kernel to induce temporal correlation in data gaps if prop < 1
+
+Note that some other settings (such as default parameter values, and
+which parameters will be varied temporally) are set in the class
+constructor. In this case, we run the forward model twice, to create
+two distinct datasets: a complete best-case scenario, and a second
+scenario where the missing observations (with a proportion of 0.5 missing
+observations). These two datafiles are "clean", i.e., there's no noise.
+The ``Sentinel.addNoiseToObservations`` adds Gaussian independent noise
+to the observations. The variance of the  noise is estipulated in the 
+header of the clean data file (a linear increase of uncertainty with
+wavelength).
+
+Solving each data individually
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+This part of the code will solve for each observation individually: 
+assuming some prior knowledge, we solve for the weighted least squares
+fit. Mathematically, this for each observation :math:`\mathbf{y}`, we
+minimise the functional :math:`J(\mathbf{x})`, where :math:`\mathbf{x}` 
+is the state tht describes that observation.
+
+.. math::
+    J(\mathbf{x}) = \left(\mathbf{x}-\mathbf{x}_{p}\right)^{T}\mathbf{C}^{-1}_{prior}\left(\mathbf{x}-\mathbf{x}_{p}\right) + \left(H(\mathbf{x})-\mathbf{y}\right)^{T}\mathbf{C}^{-1}_{obs}\left(H(\mathbf{x})-\mathbf{y}\right)
+    
+Solving for single observations is a very hard problem: there usually
+isn't an unique solution as parameter compensate for each other, and
+the observational constraint does not have enough information to allow
+this. This is made even worse by additional noise. In consequence, the
+shape of :math:`J(\mathbf{x})` is very flat over large areas, showing
+no strong preference for values of the state vector. As a first test,
+we can use the noise-free synthetic observations and invert them using
+some kind of gradient descent algorithm that minimises :math:`J(\mathbf{x})`.
+To make it faster, we can start the gradient descent algorithm with the
+true values, and then calculate the Hessian and its inverse and look at
+uncertainties in retrieved parameters. This is quite instructive in its
+own right. A second test would be start the minimisation at some other 
+point that it's not the true state, and see how the solution compares.
+Finally, we'd want to invert each individual observation, taking into
+account the noise.
+
+We test some of these ideas with the clean datasets
+(those that have had no noise added to them). We also plot the results
+using graphical methods ``Sentinel.crossPlot`` and ``Sentinel.paramPlot``.
+
+.. literalinclude:: ../sentinel.py
+   :language: python
+   :lines: 902-943
+   
+.. figure:: sentinelClean1.png
+   :width: 90%
+   
+   Inverting each individual observation (no noise) starting from the true solution.
+   Left panel: (transformed) parameters and 95% CI
+   Right panel: scatterplot of retrieved parameters vs true parameters.
+   
+.. figure:: sentinelClean2.png
+   :width: 90%
+   
+   Inverting each individual observation (no noise) not specifying the true solution.    
+   Left panel: (transformed) parameters and 95% CI
+   Right panel: scatterplot of retrieved parameters vs true parameters.
+            
+.. figure:: sentinel.png
+   :width: 90%
+   
+   Inverting each individual noisy observation starting from the true solution. Complete series.
+   Left panel: (transformed) parameters and 95% CI
+   Right panel: scatterplot of retrieved parameters vs true parameters.
+
+.. figure:: sentinelGap.png
+   :width: 90%
+   
+   Inverting each individual noisy observation starting from the true solution. Gappy series.
+   Left panel: (transformed) parameters and 95% CI
+   Right panel: scatterplot of retrieved parameters vs true parameters.
+            
+Solving using data assimilation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

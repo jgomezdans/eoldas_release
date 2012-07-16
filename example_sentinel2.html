@@ -192,18 +192,165 @@ out files, and also runs the eoldas prototype as required. As mentioned
 above, we use the <a class="reference external" href="http://rhodesmill.org/pyephem/">pyephem</a> package
 to simulate the solar geometry.</p>
 </div>
-<div class="section" id="simulating-the-acquisition-geometry">
-<h2>Simulating the acquisition geometry<a class="headerlink" href="#simulating-the-acquisition-geometry" title="Permalink to this headline">¶</a></h2>
-<p>Solar calculations are performed in the <tt class="docutils literal"><span class="pre">fwdModel</span></tt> method of
-<tt class="docutils literal"><span class="pre">Sentinel</span></tt>:</p>
-<div class="highlight-python"><div class="highlight"><pre>    <span class="n">o</span> <span class="o">=</span> <span class="n">ephem</span><span class="o">.</span><span class="n">Observer</span><span class="p">()</span>
-    <span class="n">o</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">o</span><span class="o">.</span><span class="n">long</span><span class="p">,</span> <span class="n">o</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span> <span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">year</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
-    <span class="n">sun</span> <span class="o">=</span> <span class="n">ephem</span><span class="o">.</span><span class="n">Sun</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
-    <span class="n">dd</span> <span class="o">=</span> <span class="n">o</span><span class="o">.</span><span class="n">date</span>
+<div class="section" id="generating-the-synthetic-observations">
+<h2>Generating the synthetic observations<a class="headerlink" href="#generating-the-synthetic-observations" title="Permalink to this headline">¶</a></h2>
+<p>The code for this is fairly simple, and can be seen in the <tt class="docutils literal"><span class="pre">main</span></tt>
+function in <tt class="docutils literal"><span class="pre">sentinel.py</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre>  <span class="n">s</span> <span class="o">=</span> <span class="n">Sentinel</span><span class="p">()</span>
+  <span class="c"># generate parameter dataset</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">parameters</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">366</span><span class="p">),</span><span class="s">&#39;input/truth.dat&#39;</span><span class="p">)</span>
+  <span class="c"># generate noise free observations (every 5 days)</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">fwdModel</span><span class="p">(</span><span class="s">&#39;input/truth.dat&#39;</span><span class="p">,</span><span class="s">&#39;input/sentinelClean.dat&#39;</span><span class="p">,</span><span class="n">every</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">fwdModel</span><span class="p">(</span><span class="s">&#39;input/truth.dat&#39;</span><span class="p">,</span><span class="s">&#39;input/sentinelGapClean.dat&#39;</span><span class="p">,</span><span class="n">every</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">prop</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span><span class="n">WINDOW</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+  <span class="c"># add noise to the observations</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">addNoiseToObservations</span><span class="p">(</span><span class="s">&#39;input/sentinelClean.dat&#39;</span><span class="p">,</span><span class="s">&#39;input/sentinel.dat&#39;</span><span class="p">,</span><span class="n">nMag</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">addNoiseToObservations</span><span class="p">(</span><span class="s">&#39;input/sentinelGapClean.dat&#39;</span><span class="p">,</span><span class="s">&#39;input/sentinelGap.dat&#39;</span><span class="p">,</span><span class="n">nMag</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>We assume that the satellite overpass is 10:30 local time, and give
-a suitable longitude and latitude.</p>
+<p>We first instantiate the <tt class="docutils literal"><span class="pre">Sentinel</span></tt> class, calculate the parameter
+temporal trajectories using the <tt class="docutils literal"><span class="pre">Sentinel.parameters</span></tt> method. This
+requires a time axis as well as an output file (in this case,
+<tt class="docutils literal"><span class="pre">input/truth.dat</span></tt>. This file can also be used to compare inversion
+results etc.). Once the parameter trajectories have been established,
+we can forward model them to surface reflectance using the <tt class="docutils literal"><span class="pre">Sentinel.fwdModel</span></tt>
+method. This method has a number of options that are important to note:</p>
+<dl class="docutils">
+<dt><tt class="docutils literal"><span class="pre">ifile</span></tt></dt>
+<dd>input data (parameters) file</dd>
+<dt><tt class="docutils literal"><span class="pre">ofile</span></tt></dt>
+<dd>output reflectance data file</dd>
+<dt><tt class="docutils literal"><span class="pre">lat</span></tt></dt>
+<dd>latitude (default &#8216;50:0&#8217;) (see ephem)</dd>
+<dt><tt class="docutils literal"><span class="pre">lon</span></tt></dt>
+<dd>longitude (default &#8216;&#8216;0:0&#8217;) (see ephem)</dd>
+<dt><tt class="docutils literal"><span class="pre">year</span></tt></dt>
+<dd>as int or string (default &#8216;2011&#8217;)</dd>
+<dt><tt class="docutils literal"><span class="pre">maxVza</span></tt></dt>
+<dd>maximum view zenith angle assumed (15 degrees default)</dd>
+<dt><tt class="docutils literal"><span class="pre">minSD</span></tt></dt>
+<dd>minimum noise</dd>
+<dt><tt class="docutils literal"><span class="pre">maxSD</span></tt></dt>
+<dd>maximum noise. The uncertainty in each waveband is scaled linearly with wavelength between minSD and maxSD</dd>
+<dt><tt class="docutils literal"><span class="pre">fullBand</span></tt></dt>
+<dd>set True if you want full band pass else False (default False). Note that its much slower to set this True.</dd>
+<dt><tt class="docutils literal"><span class="pre">confFile</span></tt></dt>
+<dd>configuration file (default <tt class="docutils literal"><span class="pre">config_files/sentinel0.conf</span></tt>). If this file doesnt exist, it will be generated from <tt class="docutils literal"><span class="pre">self.confTxt</span></tt>. If that doesn&#8217;t exist, <tt class="docutils literal"><span class="pre">self.generateConfTxt()</span></tt>  is invoked to provide a default.</dd>
+<dt><tt class="docutils literal"><span class="pre">every</span></tt></dt>
+<dd>sample output every &#8216;every&#8217; doys (default 5)</dd>
+<dt><tt class="docutils literal"><span class="pre">prop</span></tt></dt>
+<dd>proportion of clear sample days (default 1.0)</dd>
+<dt><tt class="docutils literal"><span class="pre">WINDOW</span></tt></dt>
+<dd>size of smoothing kernel to induce temporal correlation in data gaps if prop &lt; 1</dd>
+</dl>
+<p>Note that some other settings (such as default parameter values, and
+which parameters will be varied temporally) are set in the class
+constructor. In this case, we run the forward model twice, to create
+two distinct datasets: a complete best-case scenario, and a second
+scenario where the missing observations (with a proportion of 0.5 missing
+observations). These two datafiles are &#8220;clean&#8221;, i.e., there&#8217;s no noise.
+The <tt class="docutils literal"><span class="pre">Sentinel.addNoiseToObservations</span></tt> adds Gaussian independent noise
+to the observations. The variance of the  noise is estipulated in the
+header of the clean data file (a linear increase of uncertainty with
+wavelength).</p>
+</div>
+<div class="section" id="solving-each-data-individually">
+<h2>Solving each data individually<a class="headerlink" href="#solving-each-data-individually" title="Permalink to this headline">¶</a></h2>
+<p>This part of the code will solve for each observation individually:
+assuming some prior knowledge, we solve for the weighted least squares
+fit. Mathematically, this for each observation <img class="math" src="_images/math/6c382eeb0dad017400c2bb6e32c2d5bdf4002c3e.png" alt="\mathbf{y}"/>, we
+minimise the functional <img class="math" src="_images/math/02d945b2ad3726d4cd04e23514450581f231d909.png" alt="J(\mathbf{x})"/>, where <img class="math" src="_images/math/5f61118f2ae912f86e683687c005145b5eb54aec.png" alt="\mathbf{x}"/>
+is the state tht describes that observation.</p>
+<div class="math">
+<p><img src="_images/math/2bae6539575b2105ac6b1c82cd388d4488d5822f.png" alt="J(\mathbf{x}) = \left(\mathbf{x}-\mathbf{x}_{p}\right)^{T}\mathbf{C}^{-1}_{prior}\left(\mathbf{x}-\mathbf{x}_{p}\right) + \left(H(\mathbf{x})-\mathbf{y}\right)^{T}\mathbf{C}^{-1}_{obs}\left(H(\mathbf{x})-\mathbf{y}\right)"/></p>
+</div><p>Solving for single observations is a very hard problem: there usually
+isn&#8217;t an unique solution as parameter compensate for each other, and
+the observational constraint does not have enough information to allow
+this. This is made even worse by additional noise. In consequence, the
+shape of <img class="math" src="_images/math/02d945b2ad3726d4cd04e23514450581f231d909.png" alt="J(\mathbf{x})"/> is very flat over large areas, showing
+no strong preference for values of the state vector. As a first test,
+we can use the noise-free synthetic observations and invert them using
+some kind of gradient descent algorithm that minimises <img class="math" src="_images/math/02d945b2ad3726d4cd04e23514450581f231d909.png" alt="J(\mathbf{x})"/>.
+To make it faster, we can start the gradient descent algorithm with the
+true values, and then calculate the Hessian and its inverse and look at
+uncertainties in retrieved parameters. This is quite instructive in its
+own right. A second test would be start the minimisation at some other
+point that it&#8217;s not the true state, and see how the solution compares.
+Finally, we&#8217;d want to invert each individual observation, taking into
+account the noise.</p>
+<p>We test some of these ideas with the clean datasets
+(those that have had no noise added to them). We also plot the results
+using graphical methods <tt class="docutils literal"><span class="pre">Sentinel.crossPlot</span></tt> and <tt class="docutils literal"><span class="pre">Sentinel.paramPlot</span></tt>.</p>
+<div class="highlight-python"><div class="highlight"><pre>  <span class="c"># solve for parameter estimate, using one date at a time</span>
+  <span class="c"># e.g. test for clean data starting from the correct value</span>
+  <span class="c"># This should work perfectly &amp; go stright to the the solution</span>
+  <span class="c"># So, this is a sanity check for the solver mainly, but it is also</span>
+  <span class="c"># interesting to look at the distribution of uncertainties</span>
+  <span class="c"># in the plot plots/sentinelClean1_pplot.png</span>
+  <span class="c"># When we add noise, we expect the solution to lie somewhere in these bounds</span>
+  <span class="c"># generally.</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">solveSingle</span><span class="p">(</span><span class="s">&#39;input/sentinelClean.dat&#39;</span><span class="p">,</span><span class="s">&#39;output/sentinelClean1.dat&#39;</span><span class="p">,</span><span class="n">initial</span><span class="o">=</span><span class="s">&#39;input/truth.dat&#39;</span><span class="p">)</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">crossPlot</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;input/truth.dat&#39;</span><span class="p">),</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;output/sentinelClean1.dat&#39;</span><span class="p">),</span>\
+            <span class="n">params</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="s">&#39;plots/sentinelClean1_xplot.png&#39;</span><span class="p">)</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">paramPlot</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;input/truth.dat&#39;</span><span class="p">),</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;output/sentinelClean1.dat&#39;</span><span class="p">),</span>\
+            <span class="n">params</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="s">&#39;plots/sentinelClean1_pplot.png&#39;</span><span class="p">)</span>
+
+  <span class="c"># e.g. test for clean data not starting from the correct value</span>
+  <span class="c"># Ideally, this would provide the same result, but that is unlikely</span>
+  <span class="c"># as the cost function is quite flat around the minimum.</span>
+  <span class="c"># But actually it does a pretty good job other than perhaps the </span>
+  <span class="c"># first sample, which suggests that we need to reconsider</span>
+  <span class="c"># starting positions if we can afford it (e.g. go through the</span>
+  <span class="c"># series backwards as well) </span>
+  <span class="n">s</span><span class="o">.</span><span class="n">solveSingle</span><span class="p">(</span><span class="s">&#39;input/sentinelClean.dat&#39;</span><span class="p">,</span><span class="s">&#39;output/sentinelClean2.dat&#39;</span><span class="p">)</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">crossPlot</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;input/truth.dat&#39;</span><span class="p">),</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;output/sentinelClean2.dat&#39;</span><span class="p">),</span>\
+            <span class="n">params</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="s">&#39;plots/sentinelClean2_xplot.png&#39;</span><span class="p">)</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">paramPlot</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;input/truth.dat&#39;</span><span class="p">),</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;output/sentinelClean2.dat&#39;</span><span class="p">),</span>\
+            <span class="n">params</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="s">&#39;plots/sentinelClean2_pplot.png&#39;</span><span class="p">)</span>
+
+  <span class="c"># e.g. test normal, i.e. data with noise. This is now a realistic test</span>
+  <span class="c"># of the solver for noisy data. We expect the result to be similar</span>
+  <span class="c"># to the truth (mostly within the 90% CI) </span>
+  <span class="c"># Again, this should do a pretty decent job</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">solveSingle</span><span class="p">(</span><span class="s">&#39;input/sentinel.dat&#39;</span><span class="p">,</span><span class="s">&#39;output/sentinel.dat&#39;</span><span class="p">)</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">crossPlot</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;input/truth.dat&#39;</span><span class="p">),</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;output/sentinel.dat&#39;</span><span class="p">),</span>\
+            <span class="n">params</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="s">&#39;plots/sentinel_xplot.png&#39;</span><span class="p">)</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">paramPlot</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;input/truth.dat&#39;</span><span class="p">),</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;output/sentinel.dat&#39;</span><span class="p">),</span>\
+            <span class="n">params</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="s">&#39;plots/sentinel_pplot.png&#39;</span><span class="p">)</span>
+
+  <span class="n">s</span><span class="o">.</span><span class="n">solveSingle</span><span class="p">(</span><span class="s">&#39;input/sentinelGap.dat&#39;</span><span class="p">,</span><span class="s">&#39;output/sentinelGap.dat&#39;</span><span class="p">)</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">crossPlot</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;input/truth.dat&#39;</span><span class="p">),</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;output/sentinelGap.dat&#39;</span><span class="p">),</span>\
+            <span class="n">params</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="s">&#39;plots/sentinelGap_xplot.png&#39;</span><span class="p">)</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">paramPlot</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;input/truth.dat&#39;</span><span class="p">),</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;output/sentinelGap.dat&#39;</span><span class="p">),</span>\
+            <span class="n">params</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="s">&#39;plots/sentinelGap_pplot.png&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="figure">
+<img alt="_images/sentinelClean1.png" src="_images/sentinelClean1.png" style="width: 90%;" />
+<p class="caption">Inverting each individual observation (no noise) starting from the true solution.
+Left panel: (transformed) parameters and 95% CI
+Right panel: scatterplot of retrieved parameters vs true parameters.</p>
+</div>
+<div class="figure">
+<img alt="_images/sentinelClean2.png" src="_images/sentinelClean2.png" style="width: 90%;" />
+<p class="caption">Inverting each individual observation (no noise) not specifying the true solution.
+Left panel: (transformed) parameters and 95% CI
+Right panel: scatterplot of retrieved parameters vs true parameters.</p>
+</div>
+<div class="figure">
+<img alt="_images/sentinel.png" src="_images/sentinel.png" style="width: 90%;" />
+<p class="caption">Inverting each individual noisy observation starting from the true solution. Complete series.
+Left panel: (transformed) parameters and 95% CI
+Right panel: scatterplot of retrieved parameters vs true parameters.</p>
+</div>
+<div class="figure">
+<img alt="_images/sentinelGap.png" src="_images/sentinelGap.png" style="width: 90%;" />
+<p class="caption">Inverting each individual noisy observation starting from the true solution. Gappy series.
+Left panel: (transformed) parameters and 95% CI
+Right panel: scatterplot of retrieved parameters vs true parameters.</p>
+</div>
+</div>
+<div class="section" id="solving-using-data-assimilation">
+<h2>Solving using data assimilation<a class="headerlink" href="#solving-using-data-assimilation" title="Permalink to this headline">¶</a></h2>
 </div>
 </div>
 
