@@ -40,29 +40,29 @@ OpenOpt is an optimisation suite, and is optional, although its use is
 highly recommended. Using ``pip`` or ``easy_install``, the Python
 package installers, it can be installed as ::
 
-easy_install -U openopt 
+    easy_install -U openopt 
 
 or ::
 
-pip install openopt
+    pip install openopt
 
 Note that if you do not have root/superuser access, you can install it
 for your user as ::
 
-easy_install --user -U openopt
+    easy_install --user -U openopt
 
 or ::
 
-pip install --user openopt
+    pip install --user openopt
 
 The eoldas distribution can be installed using the same approach as
 OpenOpt: ::
 
-easy_install --user -U eoldas
+    easy_install --user -U eoldas
 
-or ::
-
-pip install --user eoldas
+or::
+    
+    pip install --user eoldas
 
 This will install as an user, ignore the ``--user`` option to do a 
 system-wide install. Note that executables will be installed too, and 
@@ -83,7 +83,7 @@ The user's guide is available on  `github.com <http://github.com/jgomezdans/eold
 Although you can just download an archive with the examples, data and
 source of this guide, we encourage you to `fork <https://help.github.com/articles/fork-a-repo>`_ 
 the `eoldas_release git repository <http://github.com/jgomezdans/eoldas_release/>`_,
- and to work on it and submit bug reports, fixes etc.
+and to work on it and submit bug reports, fixes etc.
 
 The EOLDAS community
 ^^^^^^^^^^^^^^^^^^^^^^^
