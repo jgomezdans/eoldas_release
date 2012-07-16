@@ -180,17 +180,39 @@ wavelength).
 Solving each data individually
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-A number of tests are performed. These solve for the land surface
-parameters for each observation at a time. The aim of these experiments
-is didactic: we want to see how starting points affect the solution. This
-is important, as the problem we are trying to solve shows flat cost functions
-and many local minima. We test some of these ideas with the clean datasets
+This part of the code will solve for each observation individually: 
+assuming some prior knowledge, we solve for the weighted least squares
+fit. Mathematically, this for each observation :math:`\mathbf{y}`, we
+minimise the functional :math:`J(\mathbf{x})`, where :math:`\mathbf{x}` 
+is the state tht describes that observation.
+
+.. math::
+    J(\mathbf{x}) = \left(\mathbf{x}-\mathbf{x}_{p}\right)^{T}\mathbf{C}^{-1}_{prior}\left(\mathbf{x}-\mathbf{x}_{p}\right) + \left(H(\mathbf{x})-\mathbf{y}\right)^{T}\mathbf{C}^{-1}_{obs}\left(H(\mathbf{x})-\mathbf{y}\right)
+    
+Solving for single observations is a very hard problem: there usually
+isn't an unique solution as parameter compensate for each other, and
+the observational constraint does not have enough information to allow
+this. This is made even worse by additional noise. In consequence, the
+shape of :math:`J(\mathbf{x})` is very flat over large areas, showing
+no strong preference for values of the state vector. As a first test,
+we can use the noise-free synthetic observations and invert them using
+some kind of gradient descent algorithm that minimises :math:`J(\mathbf{x})`.
+To make it faster, we can start the gradient descent algorithm with the
+true values, and then calculate the Hessian and its inverse and look at
+uncertainties in retrieved parameters. This is quite instructive in its
+own right. A second test would be start the minimisation at some other 
+point that it's not the true state, and see how the solution compares.
+Finally, we'd want to invert each individual observation, taking into
+account the noise.
+
+We test some of these ideas with the clean datasets
 (those that have had no noise added to them). We also plot the results
-using graphical method ``Sentinel.crossPlot`` and ``Sentinel.paramPlot``.
+using graphical methods ``Sentinel.crossPlot`` and ``Sentinel.paramPlot``.
 
 .. literalinclude:: ../sentinel.py
    :language: python
    :lines: 902-943
+   
 
 Solving using data assimilation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
