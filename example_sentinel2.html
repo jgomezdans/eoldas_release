@@ -138,30 +138,27 @@ need to estimate the strength of the regularisation, a hyperparameter.
 In <a class="reference external" href="http://dx.doi.org/10.1016/j.rse.2011.12.027">Lewis et al (2011)</a>
 this is done using cross-validation. In the paper, we proceeded as follows:</p>
 <ol class="arabic">
-<li><dl class="first docutils">
-<dt>Set a number of values that <img class="math" src="_images/math/913e49ea63c6c130bb8d9d1c3556b052ecc404f8.png" alt="\Gamma"/> might take. This will necessarily be a large range (say from <img class="math" src="_images/math/e32627f389178685006a709382158817d19bacc8.png" alt="10^{-5}-10^{5}"/>), but prior experience might dictate a suitable interval.</dt>
-<dd><ol class="first last arabic">
-<li><dl class="first docutils">
-<dt>For one value of <img class="math" src="_images/math/913e49ea63c6c130bb8d9d1c3556b052ecc404f8.png" alt="\Gamma"/>...</dt>
-<dd><ol class="first last arabic">
-<li><dl class="first docutils">
-<dt>Select one single observation, and remove it from the observations that will go into the inversion</dt>
-<dd><ol class="first last arabic simple">
+<li><p class="first">Set a number of values that <img class="math" src="_images/math/913e49ea63c6c130bb8d9d1c3556b052ecc404f8.png" alt="\Gamma"/> might take. This will necessarily be a large range (say from <img class="math" src="_images/math/e32627f389178685006a709382158817d19bacc8.png" alt="10^{-5}-10^{5}"/>), but prior experience might dictate a suitable interval.</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p class="first">For one value of <img class="math" src="_images/math/913e49ea63c6c130bb8d9d1c3556b052ecc404f8.png" alt="\Gamma"/>...</p>
+<blockquote>
+<div><ol class="arabic">
+<li><p class="first">Select one single observation, and remove it from the observations that will go into the inversion</p>
+<blockquote>
+<div><ol class="arabic simple">
 <li>Solve the inverse problem</li>
 <li>Predict the missing observation, and compare with the truth</li>
 </ol>
-</dd>
-</dl>
+</div></blockquote>
 </li>
 <li><p class="first">Calculate a prediction metric, such as root mean square error (RMSE) or similar</p>
 </li>
 </ol>
-</dd>
-</dl>
+</div></blockquote>
 </li>
 </ol>
-</dd>
-</dl>
+</div></blockquote>
 </li>
 <li><p class="first">Select the value of <img class="math" src="_images/math/913e49ea63c6c130bb8d9d1c3556b052ecc404f8.png" alt="\Gamma"/> that results in the most accurate predictions.</p>
 </li>
@@ -351,6 +348,41 @@ Right panel: scatterplot of retrieved parameters vs true parameters.</p>
 </div>
 <div class="section" id="solving-using-data-assimilation">
 <h2>Solving using data assimilation<a class="headerlink" href="#solving-using-data-assimilation" title="Permalink to this headline">¶</a></h2>
+<p>Finally, we can solve the problem using the DA framework. This is done
+using the <tt class="docutils literal"><span class="pre">Sentinel.solveRegular</span></tt> method. One way to speed up
+processing is to start the inversion with the results calculated above
+for the single observations.</p>
+<div class="highlight-python"><div class="highlight"><pre>  <span class="c"># now, taking the result of the single inversion as the inital estimate (at the data points)</span>
+  <span class="c"># try to solve for all time samples using regularisation</span>
+  <span class="c"># If this takes some time, watch the world go by in the grpahs such as</span>
+  <span class="c"># in output/sentinel_O_1_gamma_100_resul*.png</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">solveRegular</span><span class="p">(</span><span class="s">&#39;input/sentinel.dat&#39;</span><span class="p">,</span><span class="s">&#39;output/sentinel_O_1_gamma_150.dat&#39;</span><span class="p">,</span>\
+            <span class="n">modelOrder</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">gamma</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span><span class="n">initial</span><span class="o">=</span><span class="s">&#39;output/sentinel.dat&#39;</span><span class="p">)</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">solveRegular</span><span class="p">(</span><span class="s">&#39;input/sentinelGap.dat&#39;</span><span class="p">,</span><span class="s">&#39;output/sentinelGap_O_1_gamma_150.dat&#39;</span><span class="p">,</span>\
+            <span class="n">modelOrder</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">gamma</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span><span class="n">initial</span><span class="o">=</span><span class="s">&#39;output/sentinelGap.dat&#39;</span><span class="p">)</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">solveRegular</span><span class="p">(</span><span class="s">&#39;input/sentinel.dat&#39;</span><span class="p">,</span><span class="s">&#39;output/sentinel_O_2_gamma_530.dat&#39;</span><span class="p">,</span>\
+            <span class="n">modelOrder</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">gamma</span><span class="o">=</span><span class="mi">530</span><span class="p">,</span><span class="n">initial</span><span class="o">=</span><span class="s">&#39;output/sentinel.dat&#39;</span><span class="p">)</span>
+  <span class="n">s</span><span class="o">.</span><span class="n">solveRegular</span><span class="p">(</span><span class="s">&#39;input/sentinelGap.dat&#39;</span><span class="p">,</span><span class="s">&#39;output/sentinelGap_O_2_gamma_530.dat&#39;</span><span class="p">,</span>\
+            <span class="n">modelOrder</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">gamma</span><span class="o">=</span><span class="mi">530</span><span class="p">,</span><span class="n">initial</span><span class="o">=</span><span class="s">&#39;output/sentinelGap.dat&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Here we need to put the solution plots. However, it appears that
+we might need new <img class="math" src="_images/math/913e49ea63c6c130bb8d9d1c3556b052ecc404f8.png" alt="\Gamma"/> values?</p>
+</div>
+<div class="figure">
+<img alt="_images/sentinel.png" src="_images/sentinel.png" style="width: 90%;" />
+<p class="caption">Inverting each individual noisy observation starting from the true solution. Complete series.
+Left panel: (transformed) parameters and 95% CI
+Right panel: scatterplot of retrieved parameters vs true parameters.</p>
+</div>
+<div class="figure">
+<img alt="_images/sentinelGap.png" src="_images/sentinelGap.png" style="width: 90%;" />
+<p class="caption">Inverting each individual noisy observation starting from the true solution. Gappy series.
+Left panel: (transformed) parameters and 95% CI
+Right panel: scatterplot of retrieved parameters vs true parameters.</p>
+</div>
 </div>
 </div>
 

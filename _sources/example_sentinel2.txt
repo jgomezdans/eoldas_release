@@ -84,11 +84,16 @@ In `Lewis et al (2011) <http://dx.doi.org/10.1016/j.rse.2011.12.027>`_
 this is done using cross-validation. In the paper, we proceeded as follows:
     
 #. Set a number of values that :math:`\Gamma` might take. This will necessarily be a large range (say from :math:`10^{-5}-10^{5}`), but prior experience might dictate a suitable interval.
+
     #. For one value of :math:`\Gamma`...
+    
         #. Select one single observation, and remove it from the observations that will go into the inversion
+        
             #. Solve the inverse problem
             #. Predict the missing observation, and compare with the truth
+            
         #. Calculate a prediction metric, such as root mean square error (RMSE) or similar
+        
 #. Select the value of :math:`\Gamma` that results in the most accurate predictions.
 
 This method is clearly very time consuming, but can be carried out in
@@ -243,3 +248,32 @@ using graphical methods ``Sentinel.crossPlot`` and ``Sentinel.paramPlot``.
             
 Solving using data assimilation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Finally, we can solve the problem using the DA framework. This is done
+using the ``Sentinel.solveRegular`` method. One way to speed up
+processing is to start the inversion with the results calculated above
+for the single observations.
+
+.. literalinclude:: ../sentinel.py
+   :language: python
+   :lines: 945-956
+
+.. note::
+    
+   Here we need to put the solution plots. However, it appears that
+   we might need new :math:`\Gamma` values?
+   
+   
+.. figure:: sentinel.png
+   :width: 90%
+   
+   Inverting each individual noisy observation starting from the true solution. Complete series.
+   Left panel: (transformed) parameters and 95% CI
+   Right panel: scatterplot of retrieved parameters vs true parameters.
+
+.. figure:: sentinelGap.png
+   :width: 90%
+   
+   Inverting each individual noisy observation starting from the true solution. Gappy series.
+   Left panel: (transformed) parameters and 95% CI
+   Right panel: scatterplot of retrieved parameters vs true parameters.
