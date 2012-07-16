@@ -67,9 +67,143 @@ reduced version of the experiments that are presented in
 show the use of EOLDAS in simulating ESA&#8217;s upcoming Sentinel-2 performance
 for the inversion of biophysical parameters. In this document, we try
 to reproduce the middle column in Figure 2 in <a class="reference external" href="http://dx.doi.org/10.1016/j.rse.2011.12.027">Lewis et al (2010)</a></p>
-<p>The command for this is</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">eoldas_run</span><span class="o">.</span><span class="n">py</span> <span class="o">--</span><span class="n">conf</span><span class="o">=</span><span class="n">config_files</span><span class="o">/</span><span class="n">sentinel</span><span class="o">.</span><span class="n">conf</span> <span class="o">--</span><span class="n">no_calc_posterior_unc</span>
+<p>The experiment can be split into a set of simple tasks:</p>
+<ol class="arabic">
+<li><dl class="first docutils">
+<dt>We need to generate an appropriate set of observations. On the one hand, this requires</dt>
+<dd><ul class="first last simple">
+<li>An idea of typical angular sampling.</li>
+<li>An idea of the statistics of missing observations due to e.g. cloud.</li>
+<li>Trajectories for the land surface parameters.</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first"><em>Forward model</em> the land surface parameters to land surface reflectance.</p>
+</li>
+<li><p class="first">Add noise to the observations</p>
+</li>
+<li><p class="first">Invert the observations, with whatever prior information might be available.</p>
+</li>
+</ol>
+<p>The first step will require the definition of a typical re-visit schedule
+for the sensor, as well as information on illumination geometries. We
+make use of the <a class="reference external" href="http://rhodesmill.org/pyephem/">pyephem</a> Python package to
+calculate the solar position at a given latitude and longitude. Some
+simple rules are given to model the sensor acquisition geometry (for
+example, the view zenith angle is assumed to be random). We can use
+full wavebands, or just the median wavelength of each band (the latter
+is far more efficient, and this solution can be used as a starting
+point to solve the full bandpass problem).</p>
+<p>A further refinement is the inclusion of missing observations due to
+cloud cover, for example. It is typically observed that cloudiness
+is correlated in time, so a model of cloudiness that simulates the typical
+burst nature of cloud statistics is required. Another way to go about this
+is to use long term cloudiness observations, but we choose a very simple
+approach in this work.</p>
+<p>The parameter trajectories are functions that describe the evolution
+of a given parameter in time. In this case, we choose to vary the following
+parameters:</p>
+<ul class="simple">
+<li>LAI</li>
+<li>Chlorophyll concentration</li>
+<li>Leaf water</li>
+<li>Leaf dry matter</li>
+<li>Number of leaf layers</li>
+<li>First soil component</li>
+</ul>
+<p>This is an ambitious scenario: the analytic trajectories chosen for these
+parameters are smooth, but with very different degrees of smoothness. Some
+parameters are set to be constant (leaf layers and leaf dry matter). We
+will assume that the regulariser that solves this problem is identical
+for all the parameters, and constant in time. Even though we know that
+this is not the case, this simplifying assumption still allows the
+recovery of reasonable parameter estimates. Note that while in some cases
+(such as leaf area index) one might have mechanistic models that maybe
+use meteorological inputs to simulate photosynthesis and allocation of
+assimilated carbon to the leaves to estimate the amount of leaf area,
+for other parameters that have a significant impact on the remote sensing
+signal, these models might not be available.</p>
+<p>The forward modelling of the parameter trajectories, coupled with the
+required wavebands and illumination geometries, produces a set of
+synthetic observations: this is what a sensor, operating with the given
+characteristics would &#8220;see&#8221;, in terms of surface reflectance. As with
+any measurement, noise needs to be incorporated. We do this by adding
+some Gaussian noise to the simulated reflectances, in line with what
+we expect to be typical values after atmospheric correction. Although
+we assume noise to be uncorrelated across bands, in practice it will be.</p>
+<p>Finally, we solve the inverse problem: find the parameter trajectories
+given the set of noisy and incomplete observations. In reality, we also
+need to estimate the strength of the regularisation, a hyperparameter.
+In <a class="reference external" href="http://dx.doi.org/10.1016/j.rse.2011.12.027">Lewis et al (2011)</a>
+this is done using cross-validation. In the paper, we proceeded as follows:</p>
+<ol class="arabic">
+<li><dl class="first docutils">
+<dt>Set a number of values that <img class="math" src="_images/math/913e49ea63c6c130bb8d9d1c3556b052ecc404f8.png" alt="\Gamma"/> might take. This will necessarily be a large range (say from <img class="math" src="_images/math/e32627f389178685006a709382158817d19bacc8.png" alt="10^{-5}-10^{5}"/>), but prior experience might dictate a suitable interval.</dt>
+<dd><ol class="first last arabic">
+<li><dl class="first docutils">
+<dt>For one value of <img class="math" src="_images/math/913e49ea63c6c130bb8d9d1c3556b052ecc404f8.png" alt="\Gamma"/>...</dt>
+<dd><ol class="first last arabic">
+<li><dl class="first docutils">
+<dt>Select one single observation, and remove it from the observations that will go into the inversion</dt>
+<dd><ol class="first last arabic simple">
+<li>Solve the inverse problem</li>
+<li>Predict the missing observation, and compare with the truth</li>
+</ol>
+</dd>
+</dl>
+</li>
+<li><p class="first">Calculate a prediction metric, such as root mean square error (RMSE) or similar</p>
+</li>
+</ol>
+</dd>
+</dl>
+</li>
+</ol>
+</dd>
+</dl>
+</li>
+<li><p class="first">Select the value of <img class="math" src="_images/math/913e49ea63c6c130bb8d9d1c3556b052ecc404f8.png" alt="\Gamma"/> that results in the most accurate predictions.</p>
+</li>
+</ol>
+<p>This method is clearly very time consuming, but can be carried out in
+parallel. Note that the optimal value of <img class="math" src="_images/math/913e49ea63c6c130bb8d9d1c3556b052ecc404f8.png" alt="\Gamma"/> will be
+different if the nature of the problem (priors, order of the smoothness
+constraint, etc) changes. We shall not concern ourselves with crossvalidaiton
+here, and will use the optimal values from the paper.</p>
+<p>For comparison purposes, we will also solve each observation independently,
+which is similar to what one would do in look-up table-based inversion
+approaches. In general, the problem of inverting six parameters from
+a single multispectral observation is incredibly ill-posed. The very
+informative sampling scheme of the MSI2 sensor however allows inversions.
+We shall also calculate the associated uncertainty of these single
+inversions, which we expect to be very high (and exhibit large degrees
+of correlation between parameters), and also note that when no
+observations are available, there will be no estimate of land surface
+parameters.</p>
+<p>The next sections describe the python <a class="reference external" href="https://github.com/jgomezdans/eoldas_release/blob/master/sentinel.py">script</a>
+that performs the experiment.</p>
+<div class="section" id="anatomy-of-the-simulation-code">
+<h2>Anatomy of the simulation code<a class="headerlink" href="#anatomy-of-the-simulation-code" title="Permalink to this headline">¶</a></h2>
+<p>The code is organised in a single class, <tt class="docutils literal"><span class="pre">Sentinel</span></tt>. This class will
+perform all the above described tasks. The user might want to modify
+this class to perform other experiments. The class basically writes
+out files, and also runs the eoldas prototype as required. As mentioned
+above, we use the <a class="reference external" href="http://rhodesmill.org/pyephem/">pyephem</a> package
+to simulate the solar geometry.</p>
+</div>
+<div class="section" id="simulating-the-acquisition-geometry">
+<h2>Simulating the acquisition geometry<a class="headerlink" href="#simulating-the-acquisition-geometry" title="Permalink to this headline">¶</a></h2>
+<p>Solar calculations are performed in the <tt class="docutils literal"><span class="pre">fwdModel</span></tt> method of
+<tt class="docutils literal"><span class="pre">Sentinel</span></tt>:</p>
+<div class="highlight-python"><div class="highlight"><pre>    <span class="n">o</span> <span class="o">=</span> <span class="n">ephem</span><span class="o">.</span><span class="n">Observer</span><span class="p">()</span>
+    <span class="n">o</span><span class="o">.</span><span class="n">lat</span><span class="p">,</span> <span class="n">o</span><span class="o">.</span><span class="n">long</span><span class="p">,</span> <span class="n">o</span><span class="o">.</span><span class="n">date</span> <span class="o">=</span> <span class="n">lat</span><span class="p">,</span> <span class="n">lon</span> <span class="p">,</span> <span class="n">datetime</span><span class="o">.</span><span class="n">datetime</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">year</span><span class="p">),</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">30</span><span class="p">)</span>
+    <span class="n">sun</span> <span class="o">=</span> <span class="n">ephem</span><span class="o">.</span><span class="n">Sun</span><span class="p">(</span><span class="n">o</span><span class="p">)</span>
+    <span class="n">dd</span> <span class="o">=</span> <span class="n">o</span><span class="o">.</span><span class="n">date</span>
 </pre></div>
+</div>
+<p>We assume that the satellite overpass is 10:30 local time, and give
+a suitable longitude and latitude.</p>
 </div>
 </div>
 
