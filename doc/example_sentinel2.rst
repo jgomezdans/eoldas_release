@@ -213,6 +213,33 @@ using graphical methods ``Sentinel.crossPlot`` and ``Sentinel.paramPlot``.
    :language: python
    :lines: 902-943
    
+.. figure:: sentinelClean1.png
+   :width: 90%
+   
+   Inverting each individual observation (no noise) starting from the true solution.
+   Left panel: (transformed) parameters and 95% CI
+   Right panel: scatterplot of retrieved parameters vs true parameters.
+   
+.. figure:: sentinelClean2.png
+   :width: 90%
+   
+   Inverting each individual observation (no noise) not specifying the true solution.    
+   Left panel: (transformed) parameters and 95% CI
+   Right panel: scatterplot of retrieved parameters vs true parameters.
+            
+.. figure:: sentinel.png
+   :width: 90%
+   
+   Inverting each individual noisy observation starting from the true solution. Complete series.
+   Left panel: (transformed) parameters and 95% CI
+   Right panel: scatterplot of retrieved parameters vs true parameters.
 
+.. figure:: sentinelGap.png
+   :width: 90%
+   
+   Inverting each individual noisy observation starting from the true solution. Gappy series.
+   Left panel: (transformed) parameters and 95% CI
+   Right panel: scatterplot of retrieved parameters vs true parameters.
+            
 Solving using data assimilation
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
