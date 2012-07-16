@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+import matplotlib
+matplotlib.use("agg")
 import numpy as np
 import eoldas
 import sys,tempfile
@@ -6,7 +9,7 @@ import os
 gamma = 50
 model_order = 1
 dayStep  = 2
-BRF = 'data/modis/brdf_WW_1_A_1.kernelFiltered.dat'
+BRF = 'data/brdf_WW_1_A_1.kernelFiltered.dat'
 
 names = 'gamma_time,xlai, xhc,  rpl,  xkab, scen, xkw, xkm,   xleafn, xs1,xs2,xs3,xs4,lad'
 defaultp = '0.99,0.01,0.01,0.99,0.001,0.99,0.35,1.0,1,0.001,0.001,0.001,5'
