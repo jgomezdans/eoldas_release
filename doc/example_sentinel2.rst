@@ -29,7 +29,7 @@ The experiment can be split into a set of simple tasks:
 
 The first step will require the definition of a typical re-visit schedule
 for the sensor, as well as information on illumination geometries. We 
-make use of the `pyephem <http://www.pyephem.org>`_ Python package to
+make use of the `pyephem <http://rhodesmill.org/pyephem/>`_ Python package to
 calculate the solar position at a given latitude and longitude. Some
 simple rules are given to model the sensor acquisition geometry (for 
 example, the view zenith angle is assumed to be random). We can use
@@ -114,10 +114,22 @@ that performs the experiment.
 Anatomy of the simulation code
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The code is organised in a single class, `Sentinel`. This class will
+The code is organised in a single class, ``Sentinel``. This class will
 perform all the above described tasks. The user might want to modify
-this class to perform other experiments.
+this class to perform other experiments. The class basically writes 
+out files, and also runs the eoldas prototype as required. As mentioned
+above, we use the `pyephem <http://rhodesmill.org/pyephem/>`_ package 
+to simulate the solar geometry.
 
 Simulating the acquisition geometry
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Solar calculations are performed in the ``fwdModel`` method of 
+``Sentinel``:
+
+.. literalinclude:: ../sentinel.py
+   :language: python
+   :lines: 256-260
+
+We assume that the satellite overpass is 10:30 local time, and give 
+a suitable longitude and latitude.
