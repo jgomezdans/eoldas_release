@@ -1,0 +1,158 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Introduction &mdash; EOLDAS Users&#39; Guide 2012.06 documentation</title>
+    
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/print.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '2012.06',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/theme_extras.js"></script>
+    <link rel="top" title="EOLDAS Users&#39; Guide 2012.06 documentation" href="index.html" />
+    <link rel="next" title="A tutorial guide of the EOLDAS prototype software" href="eoldas_guide.html" />
+    <link rel="prev" title="Welcome to EOLDAS user guide’s documentation!" href="index.html" /> 
+  </head>
+  <body>
+      <div class="header">
+        <a href="index.html">
+          <img class="logo" src="_static/eoldas_logos.png" alt="Logo"/>
+        </a>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        «&#160;&#160;<a href="index.html">Welcome to EOLDAS user guide&#8217;s documentation!</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="eoldas_guide.html">A tutorial guide of the EOLDAS prototype software</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h1>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">A PDF version of this document is available
+<a class="reference external" href="http://jgomezdans.github.com/eoldas_release/EOLDAS_UsersGuide.pdf">here</a></p>
+</div>
+<p>This webiste contains a <strong>live</strong> version of the EOLDAS documentation.
+EOLDAS stands for Earth Observation Land Data Assimilation System, and
+in here we refer to an implementation of a Data Assimilation (DA)
+prototype to be used to monitor the land surface in the optical domain.
+The code is fairly generic, and can be used to implement a number of
+different variational DA schemes (although we mostly have used weak constraints)</p>
+<p>This software was developed</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">Partners, project number, thanks to etc.</p>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>EOLDAS has mostly been written in Python, with some radiative transfer
+codes written in Fortran and made available to the main Python library.
+The requirements for the package are</p>
+<ul class="simple">
+<li>Python (versions &gt; 2.5 and &lt; 3.0)</li>
+<li>Scipy</li>
+<li>Numpy</li>
+<li>Matplotlib</li>
+<li>gfortran</li>
+<li>OpenOpt (optional)</li>
+<li>git (version control system. Optional)</li>
+</ul>
+<p>The first few packages are usually available in modern Linux distributions,
+as well as in MacOsX. In some cases, the use of the <a class="reference external" href="http://www.enthought.com/products/epd.php">Enthought Python Distribution</a>
+to install a whole Python ecosystem might be a worthy option. Similar
+efforts for Windows might be found in <a class="reference external" href="http://code.google.com/p/pythonxy/">Python xy</a>.</p>
+<p>OpenOpt is an optimisation suite, and is optional, although its use is
+highly recommended. Using <tt class="docutils literal"><span class="pre">pip</span></tt> or <tt class="docutils literal"><span class="pre">easy_install</span></tt>, the Python
+package installers, it can be installed as</p>
+<div class="highlight-python"><pre>easy_install -U openopt</pre>
+</div>
+<p>or</p>
+<div class="highlight-python"><pre>pip install openopt</pre>
+</div>
+<p>Note that if you do not have root/superuser access, you can install it
+for your user as</p>
+<div class="highlight-python"><pre>easy_install --user -U openopt</pre>
+</div>
+<p>or</p>
+<div class="highlight-python"><pre>pip install --user openopt</pre>
+</div>
+<p>The eoldas distribution can be installed using the same approach as
+OpenOpt:</p>
+<div class="highlight-python"><pre>easy_install --user -U eoldas</pre>
+</div>
+<p>or:</p>
+<div class="highlight-python"><pre>pip install --user eoldas</pre>
+</div>
+<p>This will install as an user, ignore the <tt class="docutils literal"><span class="pre">--user</span></tt> option to do a
+system-wide install. Note that executables will be installed too, and
+the installation executables path will be installation dependent. Note
+that this command will also install the semidiscrete radiative transfer
+code and compile it (many warning will show up, but they are safe to
+ignore).</p>
+<p>If you plan to do development on EOLDAS, we strongly encourage you to
+<a class="reference external" href="https://help.github.com/articles/fork-a-repo">fork</a> the <a class="reference external" href="https://github.com/jgomezdans/eoldas">EOLDAS repository</a>
+on github, and feel free to submit patches, suggestions, etc.</p>
+</div>
+<div class="section" id="installing-the-user-s-guide">
+<h2>Installing the user&#8217;s guide<a class="headerlink" href="#installing-the-user-s-guide" title="Permalink to this headline">¶</a></h2>
+<p>The user&#8217;s guide is available on  <a class="reference external" href="http://github.com/jgomezdans/eoldas_release/">github.com</a>.
+Although you can just download an archive with the examples, data and
+source of this guide, we encourage you to <a class="reference external" href="https://help.github.com/articles/fork-a-repo">fork</a>
+the <a class="reference external" href="http://github.com/jgomezdans/eoldas_release/">eoldas_release git repository</a>,
+and to work on it and submit bug reports, fixes etc.</p>
+</div>
+<div class="section" id="the-eoldas-community">
+<h2>The EOLDAS community<a class="headerlink" href="#the-eoldas-community" title="Permalink to this headline">¶</a></h2>
+<p>EOLDAS is a complex and varied tool that can help solve many problems
+where Gaussian statistics are a good assumption in variational problems.
+We would like users to use github as a way to collaborate in fixing bugs,
+spreading what you can do with EOLDAS, and to put together tutorials.</p>
+</div>
+</div>
+
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        «&#160;&#160;<a href="index.html">Welcome to EOLDAS user guide&#8217;s documentation!</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="eoldas_guide.html">A tutorial guide of the EOLDAS prototype software</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2012, P Lewis and J Gomez-Dans.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
