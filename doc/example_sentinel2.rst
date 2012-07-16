@@ -121,15 +121,59 @@ out files, and also runs the eoldas prototype as required. As mentioned
 above, we use the `pyephem <http://rhodesmill.org/pyephem/>`_ package 
 to simulate the solar geometry.
 
-Simulating the acquisition geometry
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Generating the synthetic observations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Solar calculations are performed in the ``fwdModel`` method of 
-``Sentinel``:
+The code for this is fairly simple, and can be seen in the ``main``
+function in ``sentinel.py``:
 
 .. literalinclude:: ../sentinel.py
    :language: python
-   :lines: 256-260
+   :lines: 892-900
+   
+We first instantiate the ``Sentinel`` class, calculate the parameter
+temporal trajectories using the ``Sentinel.parameters`` method. This
+requires a time axis as well as an output file (in this case, 
+``input/truth.dat``. This file can also be used to compare inversion
+results etc.). Once the parameter trajectories have been established,
+we can forward model them to surface reflectance using the ``Sentinel.fwdModel``
+method. This method has a number of options that are important to note:
 
-We assume that the satellite overpass is 10:30 local time, and give 
-a suitable longitude and latitude.
+``ifile``    
+    input data (parameters) file
+``ofile``
+    output reflectance data file
+``lat``
+    latitude (default '50:0') (see ephem)
+``lon``
+    longitude (default ''0:0') (see ephem)
+``year``
+    as int or string (default '2011')
+``maxVza``     
+    maximum view zenith angle assumed (15 degrees default)
+``minSD``      
+    minimum noise
+``maxSD`` 
+    maximum noise. The uncertainty in each waveband is scaled linearly with wavelength between minSD and maxSD 
+``fullBand``   
+    set True if you want full band pass else False (default False). Note that its much slower to set this True.
+``confFile``  
+    configuration file (default ``config_files/sentinel0.conf``). If this file doesnt exist, it will be generated from ``self.confTxt``. If that doesn't exist, ``self.generateConfTxt()``  is invoked to provide a default.
+``every``     
+    sample output every 'every' doys (default 5)
+``prop``       
+    proportion of clear sample days (default 1.0)
+``WINDOW``     
+    size of smoothing kernel to induce temporal correlation in data gaps if prop < 1
+
+Note that some other settings (such as default parameter values, and
+which parameters will be varied temporally) are set in the class
+constructor. In this case, we run the forward model twice, to create
+two distinct datasets: a complete best-case scenario, and a second
+scenario where the missing observations (with a proportion of 0.5 missing
+observations). These two datafiles are "clean", i.e., there's no noise.
+The ``Sentinel.addNoiseToObservations`` adds Gaussian independent noise
+to the observations. The variance of the  noise is estipulated in the 
+header of the clean data file (a linear increase of uncertainty with
+wavelength).
+
