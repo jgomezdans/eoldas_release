@@ -10,7 +10,8 @@ Contents:
 
 .. toctree::
    :maxdepth: 3
-
+   
+   eoldas_install.rst
    eoldas_guide.rst
    example1.rst
    example2.rst
