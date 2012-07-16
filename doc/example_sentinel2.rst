@@ -177,3 +177,20 @@ to the observations. The variance of the  noise is estipulated in the
 header of the clean data file (a linear increase of uncertainty with
 wavelength).
 
+Solving each data individually
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+A number of tests are performed. These solve for the land surface
+parameters for each observation at a time. The aim of these experiments
+is didactic: we want to see how starting points affect the solution. This
+is important, as the problem we are trying to solve shows flat cost functions
+and many local minima. We test some of these ideas with the clean datasets
+(those that have had no noise added to them). We also plot the results
+using graphical method ``Sentinel.crossPlot`` and ``Sentinel.paramPlot``.
+
+.. literalinclude:: ../sentinel.py
+   :language: python
+   :lines: 902-943
+
+Solving using data assimilation
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
