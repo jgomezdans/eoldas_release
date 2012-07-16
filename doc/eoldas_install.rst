@@ -82,7 +82,8 @@ Installing the user's guide
 The user's guide is available on  `github.com <http://github.com/jgomezdans/eoldas_release/>`_. 
 Although you can just download an archive with the examples, data and
 source of this guide, we encourage you to `fork <https://help.github.com/articles/fork-a-repo>`_ 
-the git repository, and to work on it and submit bug reports, fixes etc.
+the `eoldas_release git repository <http://github.com/jgomezdans/eoldas_release/>`_,
+ and to work on it and submit bug reports, fixes etc.
 
 The EOLDAS community
 ^^^^^^^^^^^^^^^^^^^^^^^
