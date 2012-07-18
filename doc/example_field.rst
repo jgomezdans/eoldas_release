@@ -42,7 +42,9 @@ called ``main``:
 
 The structure of the code will be familiar from the sentinel experiment:
 the only novelty is the use of the ``Sentinel.smooth`` method to perform
-the smoothing of the parameters.
+the smoothing of the parameters. Instead of starting from the prior or
+from the true data, as we did in the synthetic experiment, we use the 
+``initial`` keyword to feed the smoothed interpolated estimates.
 
 Some comments
 ^^^^^^^^^^^^^^^

@@ -15,7 +15,7 @@ from sentinel import Sentinel
 
 
 def main (ifile = 'data/brdf_WW_1_A_1.kernelFiltered.dat', \
-        confFile='config_files/semid_default.conf', \
+        confFile='config_files/sentinel_Def.conf', \
         solve = ['xlai','xkab','scen','xkw','xkm','xleafn','xs1']) :
   '''
   Show that we can use this same setup to solve 

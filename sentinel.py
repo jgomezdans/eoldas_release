@@ -639,12 +639,8 @@ state = %s
     '''
     Make directory
     '''
-    try:
-      os.makedirs(os.path.dirname(name))
-    except OSError as exc: # Python >2.5
-      if exc.errno == errno.EEXIST:
-        pass
-    else: raise
+    if not os.path.exists ( os.path.dirname(name) ):
+        os.makedirs(os.path.dirname(name))
 
   def crossPlot(self,truth,est,filename=None,fontsize=16):
     '''
