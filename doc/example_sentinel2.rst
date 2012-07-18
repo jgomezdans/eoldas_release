@@ -258,22 +258,29 @@ for the single observations.
    :language: python
    :lines: 945-956
 
-.. note::
-    
-   Here we need to put the solution plots. However, it appears that
-   we might need new :math:`\Gamma` values?
-   
-   
-.. figure:: sentinel.png
-   :width: 90%
-   
-   Inverting each individual noisy observation starting from the true solution. Complete series.
-   Left panel: (transformed) parameters and 95% CI
-   Right panel: scatterplot of retrieved parameters vs true parameters.
 
-.. figure:: sentinelGap.png
+      
+.. figure:: sentinel_O_1_gamma_37.png
    :width: 90%
    
-   Inverting each individual noisy observation starting from the true solution. Gappy series.
-   Left panel: (transformed) parameters and 95% CI
-   Right panel: scatterplot of retrieved parameters vs true parameters.
+   Result of inverting the sentinel synthetic experiments with a first
+   order differential operator. Complete time series and :math:`\Gamma=37`.
+
+.. figure:: sentinelGap_O_1_gamma_37.png
+   :width: 90%
+            
+   Result of inverting the sentinel synthetic experiments with a first
+   order differential operator. Gappy time series and :math:`\Gamma=37`.
+                  
+
+.. figure:: sentinel_O_2_gamma_175.png
+   :width: 90%
+   
+   Result of inverting the sentinel synthetic experiments with a second
+   order differential operator. Complete time series and :math:`\Gamma=175`.
+
+.. figure:: sentinelGap_O_2_gamma_175.png
+   :width: 90%
+            
+   Result of inverting the sentinel synthetic experiments with a second
+   order differential operator. Gappy time series and :math:`\Gamma=175`.
