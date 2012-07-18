@@ -13,7 +13,7 @@ Welcome EOLDAS user guide's documentation!
 Introduction
 -----------------------
 
-The `EOLDAS project <http://www.eoldas.info`_ is funded by ESA as part of the `Support to Science Element (STSE) <http://due.esrin.esa.int/stse/>`_ 
+The `EOLDAS project <http://www.eoldas.info/>`_ is funded by ESA as part of the `Support to Science Element (STSE) <http://due.esrin.esa.int/stse/>`_ 
 of the Earth observation Envelope Programme.
     
 The aims of the projects are:
@@ -27,7 +27,7 @@ The project is led by the UK `National Centre for Earth Observation (NCEO) <http
 * `University College London <http://www.geog.ucl.ac.uk>`_
 * `The University of Reading <www.reading.ac.uk/>`_
 * The European Commision's `Joint Research Center <http://ies.jrc.ec.europa.eu/index.php?page=home>`_
-* `Friederich Shciller Universität Jena <http://www.geoinf.uni-jena.de/4871.0.html>`_
+* `Friederich Schiller Universität Jena <http://www.geoinf.uni-jena.de/4871.0.html>`_
 * `FastOpt GMbH <http://www.geoinf.uni-jena.de/4871.0.html>`_
 * `Assimila <http://www.assimila.eu/>`_
 
