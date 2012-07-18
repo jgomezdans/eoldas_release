@@ -1,4 +1,4 @@
-***************************************************************************
+*************************************************************** ************
 Introduction
 ***************************************************************************
 
@@ -104,7 +104,7 @@ the `eoldas_release git repository <http://github.com/jgomezdans/eoldas_release/
 and to work on it and submit bug reports, fixes etc.
 
 Getting help & Collaborating on improving EOLDAS
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+---------------------------------------------------------------
 
 EOLDAS is a complex and varied tool that can help solve many problems 
 where Gaussian statistics are a good assumption in variational problems.
