@@ -41,7 +41,7 @@ extensions = [
         'plot_directive',
         'only_directives',
         #'matplotlib.sphinxext.only_directives',
-        'sphinx.ext.pngmath',
+        'sphinx.ext.mathjax',
         'sphinx.ext.intersphinx',
         'sphinx.ext.extlinks',
 ]
