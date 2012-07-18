@@ -82,7 +82,7 @@ The plot is in ``plots/output/brdf_WW_1_A_1.kernelFiltered.dat_Gamma00000529.png
 .. figure:: brdf_WW_1_A_1.kernelFiltered.dat_Gamma00000529.png
    :width: 80%
       
-   DA solution in red (plus grey 95% credible interval). The blue line
+  DA solution in red (plus grey 95% credible interval). The blue line
   shows the initial guess. Note that this plot is in transformed coordinates.
   
 .. figure:: brdf_WW_1_A_1.kernelFiltered.dat_result.dat.plot.x.png
