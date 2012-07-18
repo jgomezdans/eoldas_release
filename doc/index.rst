@@ -11,7 +11,7 @@ EOLDAS user guide's documentation!
       
 
 Introduction
-"""""""""""""""""""""
+=============================================
 
 The `EOLDAS project <http://www.eoldas.info/>`_ is funded by ESA as part of the `Support to Science Element (STSE) <http://due.esrin.esa.int/stse/>`_ 
 of the Earth observation Envelope Programme.
@@ -31,10 +31,24 @@ The project is led by the UK `National Centre for Earth Observation (NCEO) <http
 * `FastOpt GMbH <http://www.geoinf.uni-jena.de/4871.0.html>`_
 * `Assimila <http://www.assimila.eu/>`_
 
-            
+Contact
+=============================================
 
+You can contact the authors:
+
+* `Prof P Lewis <mailto:p.lewis@ucl.ac.uk>`_
+* `Dr J Gómez-Dans <mailto:j.gomez-dans@ucl.ac.uk>`_
+
+            
+News
+=============================================
+
+July 18, 2012:
+    First official release of the EOLDAS code and documentation.
+    
+            
 Contents
-"""""""""""""
+=============================================
 
 .. toctree::
    :maxdepth: 3
