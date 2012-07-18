@@ -26,6 +26,7 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../../_static/theme_extras.js"></script>
     <link rel="top" title="EOLDAS Users&#39; Guide 2012.06 documentation" href="../../index.html" /> 
   </head>
@@ -98,12 +99,12 @@ PROSPECT model, which treats leaves as a stack of thin plates. Other parameters
 control the absorption of energy at different wavelengths. The parameters of
 the PROSPECT model are</p>
 <ol class="arabic simple">
-<li><img class="math" src="../../_images/math/fc97ef67268cd4e91bacdf12b8901d7036c9a056.png" alt="N"/>, the number of leaf layers,</li>
-<li><img class="math" src="../../_images/math/0c957bf7777d90355d32e43ecdc75f2dbc03953f.png" alt="C_{ab}"/>, the concentration of chlorophyll a+b <img class="math" src="../../_images/math/ee1e74b12f39f264a2de59426c66a4410826256c.png" alt="[\mu g cm^{-2}]"/>,</li>
-<li><img class="math" src="../../_images/math/78399164121807026294aeffeba701e5a8544cbf.png" alt="C_{car}"/>, the concentration of carotenoids <img class="math" src="../../_images/math/ee1e74b12f39f264a2de59426c66a4410826256c.png" alt="[\mu g cm^{-2}]"/>,</li>
-<li><img class="math" src="../../_images/math/363028210df284c6b3cf69d3a7ffaf0b86be65e7.png" alt="C_{w}"/>, equivalent leaf water <img class="math" src="../../_images/math/999e43c2d779b87bfa3f16da68fc4d54b7326e23.png" alt="[cm]"/>,</li>
-<li><img class="math" src="../../_images/math/40770f8de81429ad7a3b00a69aa5e5abdd817468.png" alt="C_{dm}"/>, dry matter <img class="math" src="../../_images/math/ee1e74b12f39f264a2de59426c66a4410826256c.png" alt="[\mu g cm^{-2}]"/>,</li>
-<li><img class="math" src="../../_images/math/9873c25e1d1d01c9f18cf720a4de3b45412fae95.png" alt="C_{sen}"/>, the proportion of senescent material (fractional, between 0 and 1).</li>
+<li><span class="math">\(N\)</span>, the number of leaf layers,</li>
+<li><span class="math">\(C_{ab}\)</span>, the concentration of chlorophyll a+b <span class="math">\([\mu g cm^{-2}]\)</span>,</li>
+<li><span class="math">\(C_{car}\)</span>, the concentration of carotenoids <span class="math">\([\mu g cm^{-2}]\)</span>,</li>
+<li><span class="math">\(C_{w}\)</span>, equivalent leaf water <span class="math">\([cm]\)</span>,</li>
+<li><span class="math">\(C_{dm}\)</span>, dry matter <span class="math">\([\mu g cm^{-2}]\)</span>,</li>
+<li><span class="math">\(C_{sen}\)</span>, the proportion of senescent material (fractional, between 0 and 1).</li>
 </ol>
 <p>The canopy model chosen is Semidiscrete by <a class="reference external" href="http://www.google.co.uk/url?sa=t&amp;source=web&amp;cd=2&amp;ved=0CCMQFjAB&amp;url=http%3A%2F%2Ffapar.jrc.ec.europa.eu%2FWWW%2FData%2FPages%2FFAPAR_Software%2FFAPAR_SOFTWARE%2FNADIM%2FSemidiscret_96JD04013.pdf&amp;rct=j&amp;q=semidiscrete%20gobron&amp;ei=YxRcTq7HK8bG8QP9vJGZDA&amp;usg=AFQjCNElypSrP7JeUMxbkGMK01LaDgTqnA&amp;sig2=p5OSBuf_Pl0Nxl21MWVgTw&amp;cad=rja">Gobron et al. 1997</a>, for which an adjoint has been develoepd here to allow more rapid state estimation.
 This model assumes a continuous canopy
@@ -277,14 +278,14 @@ format = 'PARAMETERS'
 </div>
 <p>The (apparent) state variables, other than gamma_time that is (potentially) used for the differential operator are:</p>
 <ol class="arabic simple">
-<li>xlai : <img class="math" src="../../_images/math/8639b116120a203b97cae8fcb7de9a551d198b69.png" alt="LAI"/>, the single sided leaf area per unit ground area</li>
+<li>xlai : <span class="math">\(LAI\)</span>, the single sided leaf area per unit ground area</li>
 <li>xhc    : The canopy height</li>
 <li>rpl    : The leaf radius/dimension (same units as canopy height)</li>
-<li>xkab   : <img class="math" src="../../_images/math/0c957bf7777d90355d32e43ecdc75f2dbc03953f.png" alt="C_{ab}"/>, the concentration of chlorophyll a+b <img class="math" src="../../_images/math/ee1e74b12f39f264a2de59426c66a4410826256c.png" alt="[\mu g cm^{-2}]"/>,</li>
-<li>scen   : <img class="math" src="../../_images/math/9873c25e1d1d01c9f18cf720a4de3b45412fae95.png" alt="C_{sen}"/>, the proportion of senescent material (fractional, between 0 and 1).</li>
-<li>xkw    : <img class="math" src="../../_images/math/363028210df284c6b3cf69d3a7ffaf0b86be65e7.png" alt="C_{w}"/>, equivalent leaf water <img class="math" src="../../_images/math/999e43c2d779b87bfa3f16da68fc4d54b7326e23.png" alt="[cm]"/>,</li>
-<li>xkm    : <img class="math" src="../../_images/math/40770f8de81429ad7a3b00a69aa5e5abdd817468.png" alt="C_{dm}"/>, dry matter <img class="math" src="../../_images/math/ee1e74b12f39f264a2de59426c66a4410826256c.png" alt="[\mu g cm^{-2}]"/>,</li>
-<li>xleafn : <img class="math" src="../../_images/math/fc97ef67268cd4e91bacdf12b8901d7036c9a056.png" alt="N"/>, the number of leaf layers,</li>
+<li>xkab   : <span class="math">\(C_{ab}\)</span>, the concentration of chlorophyll a+b <span class="math">\([\mu g cm^{-2}]\)</span>,</li>
+<li>scen   : <span class="math">\(C_{sen}\)</span>, the proportion of senescent material (fractional, between 0 and 1).</li>
+<li>xkw    : <span class="math">\(C_{w}\)</span>, equivalent leaf water <span class="math">\([cm]\)</span>,</li>
+<li>xkm    : <span class="math">\(C_{dm}\)</span>, dry matter <span class="math">\([\mu g cm^{-2}]\)</span>,</li>
+<li>xleafn : <span class="math">\(N\)</span>, the number of leaf layers,</li>
 <li>xs1    : Soil PC1 (soil brightness)</li>
 <li>xs2    : Soil wetness</li>
 <li>xs3    : not used</li>
@@ -306,8 +307,8 @@ invtransform=$parameter.names
 </div>
 <p>overrides this for the specifc states mentioned to
 tell the eoldas that there is a transformation (in the RT model code) between true state
-(e.g. <img class="math" src="../../_images/math/8639b116120a203b97cae8fcb7de9a551d198b69.png" alt="LAI"/>) and the state we solve for. The reason for using a transformation is
-in an attempt to approximately linearise the sensitivity of <img class="math" src="../../_images/math/df4e0c1b626e2abd358c8aa60271a28778f866e6.png" alt="H(x)"/> to the state variable.
+(e.g. <span class="math">\(LAI\)</span>) and the state we solve for. The reason for using a transformation is
+in an attempt to approximately linearise the sensitivity of <span class="math">\(H(x)\)</span> to the state variable.
 This is a good idea generally, for avoiding getting trapped in local minima when optimising
 and also because Gaussian statistics are more appropriate for the linearised state.
 The inverse transforms are covered in the sections <tt class="docutils literal"><span class="pre">[parameter.x.assoc_invtransform]</span></tt></p>
@@ -372,7 +373,7 @@ optimal solution based only on the model and observations, as we also have the i
 the state estimate. This is a form of prior information that we use to help constrain the problem. Using an Identity Operator
 as we have done in previous exercises is, in many ways just another way of expressing this same idea, just with a different
 statistical distribution. With &#8216;hard&#8217; bounds to the state vector elements we are assuming a &#8216;flat&#8217; probability of
-occurrence between those bounds. If we use an Identity Operator and describe <img class="math" src="../../_images/math/092e364e1d9d19ad5fffb0b46ef4cc7f2da02c1c.png" alt="y"/> as a Gaussian distribution, we have
+occurrence between those bounds. If we use an Identity Operator and describe <span class="math">\(y\)</span> as a Gaussian distribution, we have
 a &#8216;soft&#8217; bound to the problem. In many cases there are physical limits to states, for example, xlai must lie in the bound [0,1]
 or more practically away from the edges of those bounds, (0,1). Similarly, plant height cannot physically be negative.</p>
 <p>Results are written to <tt class="docutils literal"><span class="pre">output/meris/MERIS_WW_1_A_1.params</span></tt>:</p>
@@ -390,7 +391,7 @@ prior uncertainties).</p>
 reflectance very well. If we can do this, then why do we need data
 assimilation? The answer to that comes from looking back at the
 solved state information.</p>
-<p>For <tt class="docutils literal"><span class="pre">xlai</span></tt> (i.e. <img class="math" src="../../_images/math/ee90684a475fe20e22b1306ceeafc66e2e6cda7d.png" alt="\exp(-LAI/2)"/>) we retrieve a value of
+<p>For <tt class="docutils literal"><span class="pre">xlai</span></tt> (i.e. <span class="math">\(\exp(-LAI/2)\)</span>) we retrieve a value of
 0.721891, i.e. LAI of 0.652. This might well be plausible for
 the particular location, but we see that we have an uncertainty of
 0.654474 on this. Since xlai is bounded [0,1] this means that this is
@@ -404,7 +405,7 @@ Interestingly, one of the lower uncertainties is
 0.166161 for <tt class="docutils literal"><span class="pre">xkab</span></tt>. This is because MERIS <em>does</em> sample at several
 wavebands that are sensitive to chlorophyll content. The retrieved
 value here is 0.780574 which corresponds to a concentration of
-24.8 <img class="math" src="../../_images/math/ee1e74b12f39f264a2de59426c66a4410826256c.png" alt="[\mu g cm^{-2}]"/>.</p>
+24.8 <span class="math">\([\mu g cm^{-2}]\)</span>.</p>
 <p>So, not only is our knowledge of these state variables we require
 actually quite poor from a single observation, but also, if we were to
 look at the full inverse Hessian, we would see high degrees of
@@ -417,8 +418,8 @@ each wavelength, which it most certainly would not be (in that case,
 and in the absence of any further information on the error correlation
 structure, it may be appropriate to inflate the standard deviation).</p>
 <p>On the positive side, the optimisation did at least converge to a
-viable solution, and gives a final value of <img class="math" src="../../_images/math/abb5588023cfa1ac14643e9778699f03eecc57a3.png" alt="J"/> of around 3.83.
-Remember that <img class="math" src="../../_images/math/abb5588023cfa1ac14643e9778699f03eecc57a3.png" alt="J"/> is essentially half the sum of the squared
+viable solution, and gives a final value of <span class="math">\(J\)</span> of around 3.83.
+Remember that <span class="math">\(J\)</span> is essentially half the sum of the squared
 differences between modelled and measured reflectance, over 15
 wavebands here, gives an MSE equivalent of 0.51 and a RMSE of 0.71,
 which we can loosely interpret as meaning that the &#8216;average&#8217; departure
@@ -721,7 +722,7 @@ datatype = x
 </pre>
 </div>
 <p>which state that the operator (called <tt class="docutils literal"><span class="pre">operator.prior</span></tt>) is to have
-<img class="math" src="../../_images/math/aee7b7d5d9240735049fbe18de95bbd19457f9fd.png" alt="H(x) = I(x)"/> (we call the operator Operator, the default)
+<span class="math">\(H(x) = I(x)\)</span> (we call the operator Operator, the default)
 and we, simplistically here, set the state and standard deviation to
 0.5. This then is a quite loose constraint as most states are bounded [0,1].</p>
 <p>We run now with:</p>
@@ -739,7 +740,7 @@ and we, simplistically here, set the state and standard deviation to
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">Think about why that happens, statistically...
-essentially because <img class="math" src="../../_images/math/11b202720e7008efb8cec523a863be96ed526273.png" alt="C_{post}^{-1} = C_{a}^{-1} + C_{prior}^{-1}"/>.</p>
+essentially because <span class="math">\(C_{post}^{-1} = C_{a}^{-1} + C_{prior}^{-1}\)</span>.</p>
 </div>
 <p>That is fine, and, as we have noted, expected (indeed we can think of that <em>being</em> the main purpose of applying the prior constraint), but
 it does mean that users of eoldas must bear in mind the consequences of setting too tight constraints as they will result in
@@ -757,7 +758,7 @@ can be very dependent on the values chosen, but really such care must be taken a
 <h3>Summary<a class="headerlink" href="#summary" title="Permalink to this headline">¶</a></h3>
 <p>In this section, we have moved from applying simple operators where the domain of the state vector and observations was the same
 to a more typical and useful case (for EO interpretation and use), where they are not. We have introduced a physically-based radiative transfer
-tool as the operator function (one that is provided with an adjoint for (relatively) rapid optimisation of the combined cost functions <img class="math" src="../../_images/math/abb5588023cfa1ac14643e9778699f03eecc57a3.png" alt="J"/>.</p>
+tool as the operator function (one that is provided with an adjoint for (relatively) rapid optimisation of the combined cost functions <span class="math">\(J\)</span>.</p>
 <p>We have shown how eoldas configuration files can be progressively modified (and used in combination) to set up particular problems.
 We have obttained an estimate of biophysical parameters from MODIS data (failed to converge for observations on a single date), from
 MERIS data, and from both MODIS and MERIS combined.</p>

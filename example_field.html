@@ -26,6 +26,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="_static/theme_extras.js"></script>
     <link rel="top" title="EOLDAS Users&#39; Guide 2012.06 documentation" href="index.html" />
     <link rel="next" title="Spatial and multi-scale data assimilation examples" href="example_spatial.html" />
@@ -83,7 +84,7 @@ the problem.</p>
 Sentinel synthetic experiment. The code is stored in a function
 called <tt class="docutils literal"><span class="pre">main</span></tt>:</p>
 <div class="highlight-python"><div class="highlight"><pre><span class="k">def</span> <span class="nf">main</span> <span class="p">(</span><span class="n">ifile</span> <span class="o">=</span> <span class="s">&#39;data/brdf_WW_1_A_1.kernelFiltered.dat&#39;</span><span class="p">,</span> \
-        <span class="n">confFile</span><span class="o">=</span><span class="s">&#39;config_files/semid_default.conf&#39;</span><span class="p">,</span> \
+        <span class="n">confFile</span><span class="o">=</span><span class="s">&#39;config_files/sentinel_Def.conf&#39;</span><span class="p">,</span> \
         <span class="n">solve</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;xlai&#39;</span><span class="p">,</span><span class="s">&#39;xkab&#39;</span><span class="p">,</span><span class="s">&#39;scen&#39;</span><span class="p">,</span><span class="s">&#39;xkw&#39;</span><span class="p">,</span><span class="s">&#39;xkm&#39;</span><span class="p">,</span><span class="s">&#39;xleafn&#39;</span><span class="p">,</span><span class="s">&#39;xs1&#39;</span><span class="p">])</span> <span class="p">:</span>
   <span class="sd">&#39;&#39;&#39;</span>
 <span class="sd">  Show that we can use this same setup to solve </span>
@@ -116,7 +117,52 @@ called <tt class="docutils literal"><span class="pre">main</span></tt>:</p>
               <span class="n">filename</span><span class="o">=</span><span class="s">&#39;plots/</span><span class="si">%s</span><span class="s">_Gamma</span><span class="si">%08d</span><span class="s">.png&#39;</span><span class="o">%</span><span class="p">(</span><span class="n">ofile</span><span class="p">,</span><span class="n">gamma</span><span class="p">))</span>
 </pre></div>
 </div>
-<p>We can see</p>
+<p>The structure of the code will be familiar from the sentinel experiment:
+the only novelty is the use of the <tt class="docutils literal"><span class="pre">Sentinel.smooth</span></tt> method to perform
+the smoothing of the parameters. Instead of starting from the prior or
+from the true data, as we did in the synthetic experiment, we use the
+<tt class="docutils literal"><span class="pre">initial</span></tt> keyword to feed the smoothed interpolated estimates.
+We can see that the result of the single observation inversions are
+very noisy and with large uncertainties (file <tt class="docutils literal"><span class="pre">plots/testFieldDataSingle.png</span></tt>):</p>
+<div class="figure">
+<img alt="_images/testFieldDataSingle.png" src="_images/testFieldDataSingle.png" style="width: 80%;" />
+<p class="caption">Results inverting each observation individually for a wheat field.
+Note that this plot is in transformed coordinates</p>
+</div>
+<p>The parameter-by-parameter smoothing using the method of <a class="reference external" href="http://www.biomecardio.com/pageshtm/publi/csda10.pdf">Garcia (2010)</a>
+results in a smoothed and complete version of the parameter evolution.
+We can see that this is already a fairly good estimate of the parameters.
+(the plot is in <tt class="docutils literal"><span class="pre">plots/output/brdf_WW_1_A_1.kernelFilteredSingle.dat_smooth.png</span></tt>)</p>
+<div class="figure">
+<img alt="_images/brdf_WW_1_A_1.kernelFilteredSingle.dat_smooth.png" src="_images/brdf_WW_1_A_1.kernelFilteredSingle.dat_smooth.png" style="width: 80%;" />
+<p class="caption">Parameter-by-parameter smoothing and interpolation. The red line
+shows the maximum a posteriori paremeter estimate, and the grey
+lines show a measure of the uncertainty. The blue line show the
+temporal evolution of the Sentinel synthetic experiment trajectories
+for comparison. Note that this plot is in transformed coordinates</p>
+</div>
+<p>Using this a starting value, we then solve the EOLDAS problem. We expect
+that this solution is already close the minimum, so solving the problem
+will be reasonably fast. We also use the <span class="math">\(\Gamma\)</span> from the optimal
+smoothing/interpolation. While this is not exactly the same problem that
+we are solving in EOLDAS (different boundary conditions and limited
+to a second order differntial operator), we assume that there&#8217;s tolerance
+to <span class="math">\(\Gamma\)</span> (see Lewis et al 2012). The results confirm that we
+only tweak the starting solution slightly: the red line (with associated
+grey 95% CI) is very similar in most cases to the initial value (blue line).
+The plot is in <tt class="docutils literal"><span class="pre">plots/output/brdf_WW_1_A_1.kernelFiltered.dat_Gamma00000529.png</span></tt>:</p>
+<div class="figure">
+<img alt="brdf_WW_1_A_1.kernelFiltered.dat_Gamma00000529.png:width:80%" src="brdf_WW_1_A_1.kernelFiltered.dat_Gamma00000529.png:width:80%" />
+</div>
+<div class="figure">
+<img alt="_images/brdf_WW_1_A_1.kernelFiltered.dat_result.dat.plot.x.png" src="_images/brdf_WW_1_A_1.kernelFiltered.dat_result.dat.plot.x.png" style="width: 80%;" />
+<p class="caption">DA solution in red (plus grey 95% credible interval) in real
+coordinates . This plot can be found in
+<tt class="docutils literal"><span class="pre">output/brdf_WW_1_A_1.kernelFiltered.dat_result.dat.plot.x.png</span></tt></p>
+</div>
+<p>The temporal evolution shown in this las plot is consistent with the
+development of a wheat field, and even senescence and leaf water
+dynamics can arguably be identified after the peak LAI period.</p>
 </div>
 <div class="section" id="some-comments">
 <h2>Some comments<a class="headerlink" href="#some-comments" title="Permalink to this headline">¶</a></h2>

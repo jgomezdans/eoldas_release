@@ -26,6 +26,7 @@
     <script type="text/javascript" src="../../_static/jquery.js"></script>
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="../../_static/theme_extras.js"></script>
     <link rel="top" title="EOLDAS Users&#39; Guide 2012.06 documentation" href="../../index.html" /> 
   </head>
@@ -273,72 +274,72 @@ we need to fit in uncertainty in the observations and in our prior smoothness
 expectation into the problem formulation.</p>
 <p>A first approach would assume that
 each individual measurement in contaminated by independent Gaussian noise with
-a variance <img class="math" src="../../_images/math/165113d0476feeed5a9828f6de29ac4b708a3fd0.png" alt="\sigma^{2}_{obs}"/>. Stacking the uncertainties into a
+a variance <span class="math">\(\sigma^{2}_{obs}\)</span>. Stacking the uncertainties into a
 covariance
-matrix <img class="math" src="../../_images/math/7405ca1f046793f93c5d161ac9795fa9893654f6.png" alt="C_{obs}"/>, we can write the contribution of the observation
+matrix <span class="math">\(C_{obs}\)</span>, we can write the contribution of the observation
 mismatch
-to our problem as <img class="math" src="../../_images/math/973a888e7bbdc7e3dec4e87bd5cd33cd412f5d4c.png" alt="J_{obs}"/>:</p>
+to our problem as <span class="math">\(J_{obs}\)</span>:</p>
 <div class="math">
-<p><img src="../../_images/math/e8f8f885ac076e16355164ab692806520484adaf.png" alt="J_{obs} = (1/2) (\mathbf{y_{obs}} - H(\mathbf{x}))^{T} (\mathbf{C_{obs}}^{-1}+\mathbf{C_{H}}^{-1}) (\mathbf{y_{obs}} -H(\mathbf{x} )),"/></p>
-</div><p>where <img class="math" src="../../_images/math/5f61118f2ae912f86e683687c005145b5eb54aec.png" alt="\mathbf{x}"/> is our estimate of the true value of the state (i.e. what we would like to estimate)
-and <img class="math" src="../../_images/math/3446cc003b6a1d6ab5b852ad9394dd5d20e76213.png" alt="y_{obs}"/> is an observation. The operator <img class="math" src="../../_images/math/12cdaf71983dffcb469258bbb68113bcff3799a7.png" alt="H(\mathbf{x})"/> maps from the space of <img class="math" src="../../_images/math/5f61118f2ae912f86e683687c005145b5eb54aec.png" alt="\mathbf{x}"/> to the space of <img class="math" src="../../_images/math/3446cc003b6a1d6ab5b852ad9394dd5d20e76213.png" alt="y_{obs}"/>. In the general case, <img class="math" src="../../_images/math/e3ed692396587cff028430e7a3ea207c3b3051cc.png" alt="\mathbf{C_{H}}^{-1}"/> is the uncertainty in the result of the operator <img class="math" src="../../_images/math/12cdaf71983dffcb469258bbb68113bcff3799a7.png" alt="H(\mathbf{x})"/>.
-We will ignore <img class="math" src="../../_images/math/e3ed692396587cff028430e7a3ea207c3b3051cc.png" alt="\mathbf{C_{H}}^{-1}"/> in the discussion below, as the current implementation of EOLDAS
-considers only <img class="math" src="../../_images/math/41c360080d1f2f108986c47e0370c9cb4c34a964.png" alt="\mathbf{C_{obs}}^{-1}"/>, although it can be easily re-introduced into the expressions.</p>
+\[J_{obs} = (1/2) (\mathbf{y_{obs}} - H(\mathbf{x}))^{T} (\mathbf{C_{obs}}^{-1}+\mathbf{C_{H}}^{-1}) (\mathbf{y_{obs}} -H(\mathbf{x} )),\]</div>
+<p>where <span class="math">\(\mathbf{x}\)</span> is our estimate of the true value of the state (i.e. what we would like to estimate)
+and <span class="math">\(y_{obs}\)</span> is an observation. The operator <span class="math">\(H(\mathbf{x})\)</span> maps from the space of <span class="math">\(\mathbf{x}\)</span> to the space of <span class="math">\(y_{obs}\)</span>. In the general case, <span class="math">\(\mathbf{C_{H}}^{-1}\)</span> is the uncertainty in the result of the operator <span class="math">\(H(\mathbf{x})\)</span>.
+We will ignore <span class="math">\(\mathbf{C_{H}}^{-1}\)</span> in the discussion below, as the current implementation of EOLDAS
+considers only <span class="math">\(\mathbf{C_{obs}}^{-1}\)</span>, although it can be easily re-introduced into the expressions.</p>
 <p>This is a very general expression, and we will see that it is this core equation that is at the heart of the DA system in EOLDAS.</p>
-<p>In this particular case, the observation we are concerned with is our e.g. time series VI signal, so <img class="math" src="../../_images/math/3446cc003b6a1d6ab5b852ad9394dd5d20e76213.png" alt="y_{obs}"/>
-is a vector with elements equal to a stack of the VI data. We have already stated that <img class="math" src="../../_images/math/7405ca1f046793f93c5d161ac9795fa9893654f6.png" alt="C_{obs}"/> is the
+<p>In this particular case, the observation we are concerned with is our e.g. time series VI signal, so <span class="math">\(y_{obs}\)</span>
+is a vector with elements equal to a stack of the VI data. We have already stated that <span class="math">\(C_{obs}\)</span> is the
 uncertainty associated with this observation.</p>
 <p>Since our state vector (i.e. what we want to estimate) is in the same space as the observations we can use
-an Identity operator for <img class="math" src="../../_images/math/12cdaf71983dffcb469258bbb68113bcff3799a7.png" alt="H(\mathbf{x})"/>, i.e. <img class="math" src="../../_images/math/78ad165dd36023a5aa58cab9d65b52fb199de7e3.png" alt="H(\mathbf{x}) = I(\mathbf{x})"/>.
-Another way of expressing this is to suggest that <img class="math" src="../../_images/math/5f61118f2ae912f86e683687c005145b5eb54aec.png" alt="\mathbf{x}"/> is a <em>prior</em> estimate of the state variables
+an Identity operator for <span class="math">\(H(\mathbf{x})\)</span>, i.e. <span class="math">\(H(\mathbf{x}) = I(\mathbf{x})\)</span>.
+Another way of expressing this is to suggest that <span class="math">\(\mathbf{x}\)</span> is a <em>prior</em> estimate of the state variables
 that we wish to estimate, so we can call this a Prior Operator:</p>
 <div class="math">
-<p><img src="../../_images/math/ea2f82dac7264dba430b7b41baefc22fc0234b0e.png" alt="J_{prior} = (1/2) (\mathbf{y_{obs}} - I(\mathbf{x}))^{T} \mathbf{C_{obs}}^{-1} (\mathbf{y_{obs}} -I(\mathbf{x} )),"/></p>
-</div><p>We wish to find the values of  <img class="math" src="../../_images/math/5f61118f2ae912f86e683687c005145b5eb54aec.png" alt="\mathbf{x}"/> that give the minimum of <img class="math" src="../../_images/math/973a888e7bbdc7e3dec4e87bd5cd33cd412f5d4c.png" alt="J_{obs}"/>, but the constraint
+\[J_{prior} = (1/2) (\mathbf{y_{obs}} - I(\mathbf{x}))^{T} \mathbf{C_{obs}}^{-1} (\mathbf{y_{obs}} -I(\mathbf{x} )),\]</div>
+<p>We wish to find the values of  <span class="math">\(\mathbf{x}\)</span> that give the minimum of <span class="math">\(J_{obs}\)</span>, but the constraint
 with the identity operator is insufficient as the optimisation will result in the estimated state being the same as the
 input signal.</p>
 <p>To express the condition of smoothness, we can encode that, for
 example, the signal change between consecutive time steps can be also
 be expressed through a Gaussian  distribution with variance
-<img class="math" src="../../_images/math/da84f4e14fefeeb1cb41281f891e3538bf15d3c0.png" alt="\sigma^{2}_{smooth}"/>. The difference between time steps can be
+<span class="math">\(\sigma^{2}_{smooth}\)</span>. The difference between time steps can be
 calculated by introducing a first order differential operator matrix
-<img class="math" src="../../_images/math/fce8c257095503a1fb9d4bcef5db267cbef9dafc.png" alt="\mathbf{\Delta}"/> with the following form:</p>
+<span class="math">\(\mathbf{\Delta}\)</span> with the following form:</p>
 <div class="math">
-<p><img src="../../_images/math/037a24e3fe974e94ef449f74d487f9c4971ba98e.png" alt="\left(\begin{matrix} a &amp; b \\
-  c &amp; d \end{matrix}\right)"/></p>
-</div><div class="math">
-<p><img src="../../_images/math/0460eb46b9a34c31fd5983d7e3326a380cdf2dab.png" alt="\mathbf{\Delta} =
+\[\begin{split}\left(\begin{matrix} a &amp; b \\
+  c &amp; d \end{matrix}\right)\end{split}\]</div>
+<div class="math">
+\[\begin{split}\mathbf{\Delta} =
  \begin{pmatrix}
  1      &amp; -1     &amp;  0     &amp; \cdots &amp; 0\\
  0      &amp; 1      &amp; -1     &amp; \cdots &amp; 0\\
  \vdots &amp; \vdots &amp; \vdots &amp; \ddots &amp; 0\\
  0      &amp; 0      &amp; 0      &amp; \cdots &amp; -1\\
- \end{pmatrix}"/></p>
-</div><p>Stacking again the variances into a a covariance matrix, we can now define
-<img class="math" src="../../_images/math/fbe282ca5e61ac385a6f4f40c5c656ed840b0cd2.png" alt="J_{smooth}"/> as</p>
+ \end{pmatrix}\end{split}\]</div>
+<p>Stacking again the variances into a a covariance matrix, we can now define
+<span class="math">\(J_{smooth}\)</span> as</p>
 <div class="math">
-<p><img src="../../_images/math/b2d9cfd5c6fb98cf78df6dc77616600d254058e2.png" alt="J_{smooth} = (1/2)  \gamma^{2} (\mathbf{\Delta x})^{T}\mathbf{C_{smooth}}^{-1}(\mathbf{\Delta x)}."/></p>
-</div><p>Here, <img class="math" src="../../_images/math/66981fa3920210c6ad8dbe5e968783d5dd7520c3.png" alt="\gamma"/> is a term controlling the degree of smoothness: the higher it is
+\[J_{smooth} = (1/2)  \gamma^{2} (\mathbf{\Delta x})^{T}\mathbf{C_{smooth}}^{-1}(\mathbf{\Delta x)}.\]</div>
+<p>Here, <span class="math">\(\gamma\)</span> is a term controlling the degree of smoothness: the higher it is
 the smoother the result will be. Since we can consider a constraint with a first order differential model
 as a zero-order process model (i.e. tomorrow is the same as today), we can phrase the
-inverse of <img class="math" src="../../_images/math/17b2f19d3b84a0646d8ff157b73a03f37b99d1a1.png" alt="\gamma^{2}"/> as the (squared) expectation of that process model: the expectation that,
+inverse of <span class="math">\(\gamma^{2}\)</span> as the (squared) expectation of that process model: the expectation that,
 on average over the whole dataset, tomorrow will be the same as today. It is interesting
 to note that a zeroth order process model (a constraint of first order derivatives)
 provides a linear interpolation between sample points.</p>
-<p>Note that since we can sometimes assume <img class="math" src="../../_images/math/533edca6ac347a0d64baf974096d25f8359333bd.png" alt="\mathbf{C_{smooth}}"/> to be diagonal, this
+<p>Note that since we can sometimes assume <span class="math">\(\mathbf{C_{smooth}}\)</span> to be diagonal, this
 particular
 functional can be written as</p>
 <div class="math">
-<p><img src="../../_images/math/e349934e000ceee6bdda1d5aac8423b1cae02ffd.png" alt="J_{smooth} = (1/2) \gamma^2 \sum_{i=1}^{N-1} \frac{(x^{i} - x^{i-1})^2}{\sigma_{smooth}^{2}}."/></p>
-</div><p>In other words, if the evolution of the signal is smooth (i.e., little change
-between timesteps, relative to <img class="math" src="../../_images/math/21119d4f32e46c40102d3f026f09e53393d3a0f1.png" alt="\sigma_{smooth}"/>), then
-<img class="math" src="../../_images/math/fbe282ca5e61ac385a6f4f40c5c656ed840b0cd2.png" alt="J_{smooth}"/>
+\[J_{smooth} = (1/2) \gamma^2 \sum_{i=1}^{N-1} \frac{(x^{i} - x^{i-1})^2}{\sigma_{smooth}^{2}}.\]</div>
+<p>In other words, if the evolution of the signal is smooth (i.e., little change
+between timesteps, relative to <span class="math">\(\sigma_{smooth}\)</span>), then
+<span class="math">\(J_{smooth}\)</span>
 will be small. On the contrary, large and frequent changes between timesteps
-(again relative to <img class="math" src="../../_images/math/21119d4f32e46c40102d3f026f09e53393d3a0f1.png" alt="\sigma_{smooth}"/>) will result in a large contribution
-to <img class="math" src="../../_images/math/fbe282ca5e61ac385a6f4f40c5c656ed840b0cd2.png" alt="J_{smooth}"/>.</p>
+(again relative to <span class="math">\(\sigma_{smooth}\)</span>) will result in a large contribution
+to <span class="math">\(J_{smooth}\)</span>.</p>
 <p>Note also that we can replace the differential operators above by arbitrary
 orders of differential operators. A second order constraint replaces
-<img class="math" src="../../_images/math/fce8c257095503a1fb9d4bcef5db267cbef9dafc.png" alt="\mathbf{\Delta}"/> in the above by <img class="math" src="../../_images/math/f5cd5a0f75d2b309da98c30fe8042e8f2e2ca090.png" alt="\mathbf{\Delta^2}"/>, for example
+<span class="math">\(\mathbf{\Delta}\)</span> in the above by <span class="math">\(\mathbf{\Delta^2}\)</span>, for example
 and has the attraction of smoothly interpolating between sample points, rather than
 the piecewise linear result one gets from a first order derivative constraint.</p>
 <p>We can extend the idea of smoothness expectation to other expectations that we
@@ -348,38 +349,38 @@ will include signal bounds, smoothness over other different time scales, and
 perhaps
 an expectation of what the trajectory of the signal is, either from historical
 data
-or from the predictions of an ecosystem model. <img class="math" src="../../_images/math/fbe282ca5e61ac385a6f4f40c5c656ed840b0cd2.png" alt="J_{smooth}"/> states that we
+or from the predictions of an ecosystem model. <span class="math">\(J_{smooth}\)</span> states that we
 want a fit to the &#8220;model&#8221; predictions (in our example, the &#8220;model&#8221; basically
 states
 that the state does not change between timesteps), but we are quite happy to
 depart
 from this assumption if that provides a tighter fit to the observations.
-When we introduce <img class="math" src="../../_images/math/21119d4f32e46c40102d3f026f09e53393d3a0f1.png" alt="\sigma_{smooth}"/>, we introduce the concept that our expectation
+When we introduce <span class="math">\(\sigma_{smooth}\)</span>, we introduce the concept that our expectation
 or state vector model has an error, and tightly fitting to it is thus
 undesirable.</p>
-<p>So we have seen that we want to find an optimum in terms of <img class="math" src="../../_images/math/973a888e7bbdc7e3dec4e87bd5cd33cd412f5d4c.png" alt="J_{obs}"/> and
-<img class="math" src="../../_images/math/fbe282ca5e61ac385a6f4f40c5c656ed840b0cd2.png" alt="J_{smooth}"/>. We define a function, <img class="math" src="../../_images/math/abb5588023cfa1ac14643e9778699f03eecc57a3.png" alt="J"/>, the cost function, as the
+<p>So we have seen that we want to find an optimum in terms of <span class="math">\(J_{obs}\)</span> and
+<span class="math">\(J_{smooth}\)</span>. We define a function, <span class="math">\(J\)</span>, the cost function, as the
 sum of both terms:</p>
 <div class="math">
-<p><img src="../../_images/math/d24326328fa7dd92069f84078d7c13418a2d87a6.png" alt="J = J_{smooth} + J_{obs}"/></p>
-</div><p>The minimum of <img class="math" src="../../_images/math/abb5588023cfa1ac14643e9778699f03eecc57a3.png" alt="J"/> will fit both the observations and our prior
+\[J = J_{smooth} + J_{obs}\]</div>
+<p>The minimum of <span class="math">\(J\)</span> will fit both the observations and our prior
 expectation
-of the model state. If we ignore <img class="math" src="../../_images/math/fbe282ca5e61ac385a6f4f40c5c656ed840b0cd2.png" alt="J_{smooth}"/>, we simply have a typical least
+of the model state. If we ignore <span class="math">\(J_{smooth}\)</span>, we simply have a typical least
 squares problem, which may be indeterminate if the information content of the
 observations is not enough to constrain a unique solution (which is generally the case).</p>
 <p>The extra constraint
-of <img class="math" src="../../_images/math/fbe282ca5e61ac385a6f4f40c5c656ed840b0cd2.png" alt="J_{smooth}"/> can be seen as a factor that &#8216;simplifies&#8217; the problem,
+of <span class="math">\(J_{smooth}\)</span> can be seen as a factor that &#8216;simplifies&#8217; the problem,
 reducing the solution space, and making it &#8216;easier&#8217; to solve. We can call this
 approach &#8216;regularisation&#8217; as it helps to make the problem &#8216;more regular&#8217; and
 tractable.</p>
 <p>There is an obvious balance between our expectation of the signal
-(<img class="math" src="../../_images/math/fbe282ca5e61ac385a6f4f40c5c656ed840b0cd2.png" alt="J_{smooth}"/>)
-and our fidelity to the observations (<img class="math" src="../../_images/math/973a888e7bbdc7e3dec4e87bd5cd33cd412f5d4c.png" alt="J_{obs}"/>), but we should
+(<span class="math">\(J_{smooth}\)</span>)
+and our fidelity to the observations (<span class="math">\(J_{obs}\)</span>), but we should
 not generally over-concerned with that: we do not want to over-fit the observations
 in any case because we understand them to have (random) error associated with them.
 The optimal solution will
-be dependent on the balance between <img class="math" src="../../_images/math/ec555bcc4db49924c44d330ecc879f634275ea2c.png" alt="\sigma_{obs}"/> and
-<img class="math" src="../../_images/math/21119d4f32e46c40102d3f026f09e53393d3a0f1.png" alt="\sigma_{smooth}"/>.
+be dependent on the balance between <span class="math">\(\sigma_{obs}\)</span> and
+<span class="math">\(\sigma_{smooth}\)</span>.
 While the former may be available from apparatus calibration or ancillary
 measurements, the latter tends to be unknown or difficult to elucidate. We shall
 see what ways we have of identifying this parameter later on.</p>
@@ -391,8 +392,8 @@ general,
 these are termed 4DVAR problems with a weak constraint. Additionally, it is also
 possible to solve 4DVAR problems with strong constraint (this basically means
 that
-<img class="math" src="../../_images/math/f6451d5f71db495e05f846266d19c96f41dc9395.png" alt="\sigma_{smooth}=0"/>, i.e., we trust that the solution lies fully in the
-space of our expectatons. We also note that we can add more terms to <img class="math" src="../../_images/math/abb5588023cfa1ac14643e9778699f03eecc57a3.png" alt="J"/>
+<span class="math">\(\sigma_{smooth}=0\)</span>, i.e., we trust that the solution lies fully in the
+space of our expectatons. We also note that we can add more terms to <span class="math">\(J\)</span>
 to encode extra information about it. This is the core idea in a variational DA system:
 we can add constraints to the solution to express what we &#8216;know&#8217; that might
 influence our estimate, provided we know something of the uncertainty.</p>
@@ -401,8 +402,8 @@ solution should fit the observations, be smooth and follow a trend not too
 dissimilar to that given by a historical expectation. The problem is then posed
 as</p>
 <div class="math">
-<p><img src="../../_images/math/6e8e71b6cb28ebd080c96fc1ff06b96fe6d33c82.png" alt="J_{smooth}(\mathbf{x}) + J_{obs}(\mathbf{x}) + \dots = \min(\mathbf{x})"/></p>
-</div><p>This type of problems require the use of optimisation techniques, which can be
+\[J_{smooth}(\mathbf{x}) + J_{obs}(\mathbf{x}) + \dots = \min(\mathbf{x})\]</div>
+<p>This type of problems require the use of optimisation techniques, which can be
 computationally very expensive. To some degree, the use of the derivatives of
 the
 cost functionals alleviates this cost, so in the next sections, it will be
@@ -410,9 +411,9 @@ assumed
 that the derivative of the function to minimise is known, either because it has
 been calculated explicitly or because a numerical approximation can be
 estimated.</p>
-<p>Mathematically, the minumimum of <img class="math" src="../../_images/math/abb5588023cfa1ac14643e9778699f03eecc57a3.png" alt="J"/> occurs when its derivative is zero.
-Since <img class="math" src="../../_images/math/5f61118f2ae912f86e683687c005145b5eb54aec.png" alt="\mathbf{x}"/> generally has multiple elements (it is a vector) we desire
-the partial derivatives of <img class="math" src="../../_images/math/abb5588023cfa1ac14643e9778699f03eecc57a3.png" alt="J"/> with respect to <img class="math" src="../../_images/math/5f61118f2ae912f86e683687c005145b5eb54aec.png" alt="\mathbf{x}"/> to be zero.</p>
+<p>Mathematically, the minumimum of <span class="math">\(J\)</span> occurs when its derivative is zero.
+Since <span class="math">\(\mathbf{x}\)</span> generally has multiple elements (it is a vector) we desire
+the partial derivatives of <span class="math">\(J\)</span> with respect to <span class="math">\(\mathbf{x}\)</span> to be zero.</p>
 </div>
 </div>
 

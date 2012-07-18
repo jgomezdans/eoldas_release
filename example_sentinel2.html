@@ -26,6 +26,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="_static/theme_extras.js"></script>
     <link rel="top" title="EOLDAS Users&#39; Guide 2012.06 documentation" href="index.html" />
     <link rel="next" title="Inverting a time series of MODIS observations over agricultural fields" href="example_field.html" />
@@ -138,10 +139,10 @@ need to estimate the strength of the regularisation, a hyperparameter.
 In <a class="reference external" href="http://dx.doi.org/10.1016/j.rse.2011.12.027">Lewis et al (2011)</a>
 this is done using cross-validation. In the paper, we proceeded as follows:</p>
 <ol class="arabic">
-<li><p class="first">Set a number of values that <img class="math" src="_images/math/913e49ea63c6c130bb8d9d1c3556b052ecc404f8.png" alt="\Gamma"/> might take. This will necessarily be a large range (say from <img class="math" src="_images/math/e32627f389178685006a709382158817d19bacc8.png" alt="10^{-5}-10^{5}"/>), but prior experience might dictate a suitable interval.</p>
+<li><p class="first">Set a number of values that <span class="math">\(\Gamma\)</span> might take. This will necessarily be a large range (say from <span class="math">\(10^{-5}-10^{5}\)</span>), but prior experience might dictate a suitable interval.</p>
 <blockquote>
 <div><ol class="arabic">
-<li><p class="first">For one value of <img class="math" src="_images/math/913e49ea63c6c130bb8d9d1c3556b052ecc404f8.png" alt="\Gamma"/>...</p>
+<li><p class="first">For one value of <span class="math">\(\Gamma\)</span>...</p>
 <blockquote>
 <div><ol class="arabic">
 <li><p class="first">Select one single observation, and remove it from the observations that will go into the inversion</p>
@@ -160,11 +161,11 @@ this is done using cross-validation. In the paper, we proceeded as follows:</p>
 </ol>
 </div></blockquote>
 </li>
-<li><p class="first">Select the value of <img class="math" src="_images/math/913e49ea63c6c130bb8d9d1c3556b052ecc404f8.png" alt="\Gamma"/> that results in the most accurate predictions.</p>
+<li><p class="first">Select the value of <span class="math">\(\Gamma\)</span> that results in the most accurate predictions.</p>
 </li>
 </ol>
 <p>This method is clearly very time consuming, but can be carried out in
-parallel. Note that the optimal value of <img class="math" src="_images/math/913e49ea63c6c130bb8d9d1c3556b052ecc404f8.png" alt="\Gamma"/> will be
+parallel. Note that the optimal value of <span class="math">\(\Gamma\)</span> will be
 different if the nature of the problem (priors, order of the smoothness
 constraint, etc) changes. We shall not concern ourselves with crossvalidaiton
 here, and will use the optimal values from the paper.</p>
@@ -193,15 +194,15 @@ to simulate the solar geometry.</p>
 <h2>Generating the synthetic observations<a class="headerlink" href="#generating-the-synthetic-observations" title="Permalink to this headline">¶</a></h2>
 <p>The code for this is fairly simple, and can be seen in the <tt class="docutils literal"><span class="pre">main</span></tt>
 function in <tt class="docutils literal"><span class="pre">sentinel.py</span></tt>:</p>
-<div class="highlight-python"><div class="highlight"><pre><span class="n">xs1</span> <span class="o">=</span> <span class="mf">0.00</span><span class="p">,</span> <span class="mf">1.5</span>
-<span class="n">xs2</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span>
-<span class="n">xs3</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.05</span><span class="p">,</span><span class="mf">0.05</span>
-<span class="n">xs4</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.03</span><span class="p">,</span><span class="mf">0.03</span>
-<span class="n">lad</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span><span class="mi">5</span> 
+<div class="highlight-python"><div class="highlight"><pre><span class="n">lad</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span><span class="mi">5</span> 
 
 
 <span class="p">[</span><span class="n">general</span><span class="p">]</span>
 <span class="n">is_spectral</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="n">calc_posterior_unc</span><span class="o">=</span><span class="bp">True</span>
+<span class="n">help_calc_posterior_unc</span><span class="o">=</span><span class="s">&quot;Posterior uncertainty calculations&quot;</span>
+<span class="n">write_results</span><span class="o">=</span><span class="bp">True</span>
+<span class="n">doplot</span><span class="o">=</span><span class="bp">True</span>
 </pre></div>
 </div>
 <p>We first instantiate the <tt class="docutils literal"><span class="pre">Sentinel</span></tt> class, calculate the parameter
@@ -254,19 +255,19 @@ wavelength).</p>
 <h2>Solving each data individually<a class="headerlink" href="#solving-each-data-individually" title="Permalink to this headline">¶</a></h2>
 <p>This part of the code will solve for each observation individually:
 assuming some prior knowledge, we solve for the weighted least squares
-fit. Mathematically, this for each observation <img class="math" src="_images/math/6c382eeb0dad017400c2bb6e32c2d5bdf4002c3e.png" alt="\mathbf{y}"/>, we
-minimise the functional <img class="math" src="_images/math/02d945b2ad3726d4cd04e23514450581f231d909.png" alt="J(\mathbf{x})"/>, where <img class="math" src="_images/math/5f61118f2ae912f86e683687c005145b5eb54aec.png" alt="\mathbf{x}"/>
+fit. Mathematically, this for each observation <span class="math">\(\mathbf{y}\)</span>, we
+minimise the functional <span class="math">\(J(\mathbf{x})\)</span>, where <span class="math">\(\mathbf{x}\)</span>
 is the state tht describes that observation.</p>
 <div class="math">
-<p><img src="_images/math/2bae6539575b2105ac6b1c82cd388d4488d5822f.png" alt="J(\mathbf{x}) = \left(\mathbf{x}-\mathbf{x}_{p}\right)^{T}\mathbf{C}^{-1}_{prior}\left(\mathbf{x}-\mathbf{x}_{p}\right) + \left(H(\mathbf{x})-\mathbf{y}\right)^{T}\mathbf{C}^{-1}_{obs}\left(H(\mathbf{x})-\mathbf{y}\right)"/></p>
-</div><p>Solving for single observations is a very hard problem: there usually
+\[J(\mathbf{x}) = \left(\mathbf{x}-\mathbf{x}_{p}\right)^{T}\mathbf{C}^{-1}_{prior}\left(\mathbf{x}-\mathbf{x}_{p}\right) + \left(H(\mathbf{x})-\mathbf{y}\right)^{T}\mathbf{C}^{-1}_{obs}\left(H(\mathbf{x})-\mathbf{y}\right)\]</div>
+<p>Solving for single observations is a very hard problem: there usually
 isn&#8217;t an unique solution as parameter compensate for each other, and
 the observational constraint does not have enough information to allow
 this. This is made even worse by additional noise. In consequence, the
-shape of <img class="math" src="_images/math/02d945b2ad3726d4cd04e23514450581f231d909.png" alt="J(\mathbf{x})"/> is very flat over large areas, showing
+shape of <span class="math">\(J(\mathbf{x})\)</span> is very flat over large areas, showing
 no strong preference for values of the state vector. As a first test,
 we can use the noise-free synthetic observations and invert them using
-some kind of gradient descent algorithm that minimises <img class="math" src="_images/math/02d945b2ad3726d4cd04e23514450581f231d909.png" alt="J(\mathbf{x})"/>.
+some kind of gradient descent algorithm that minimises <span class="math">\(J(\mathbf{x})\)</span>.
 To make it faster, we can start the gradient descent algorithm with the
 true values, and then calculate the Hessian and its inverse and look at
 uncertainties in retrieved parameters. This is quite instructive in its
@@ -277,11 +278,7 @@ account the noise.</p>
 <p>We test some of these ideas with the clean datasets
 (those that have had no noise added to them). We also plot the results
 using graphical methods <tt class="docutils literal"><span class="pre">Sentinel.crossPlot</span></tt> and <tt class="docutils literal"><span class="pre">Sentinel.paramPlot</span></tt>.</p>
-<div class="highlight-python"><pre>help_calc_posterior_unc="Posterior uncertainty calculations"
-write_results=True
-doplot=True
-help_doplot='plotting'
-plotmod=30
+<div class="highlight-python"><pre>plotmod=30
 help_plotmod='frequency of plotting'
 plotmovie=False
 epsilon=10e-15
@@ -319,6 +316,10 @@ use_median=True
 help_use_median = "Flag to state whether full bandpass function should be used or not. If True, then the median wavelength of the bandpass function is used"
 bounds = [400,2500,1]
 help_bounds = "The spectral bounds (min,max,step) for the operator'
+ignore_derivative=False
+help_ignore_derivative = "Set to True to override loading any defined derivative functions in the library and use numerical approximations instead"
+
+[operator.obs.x]
 </pre>
 </div>
 <div class="figure">
@@ -352,11 +353,7 @@ Right panel: scatterplot of retrieved parameters vs true parameters.</p>
 using the <tt class="docutils literal"><span class="pre">Sentinel.solveRegular</span></tt> method. One way to speed up
 processing is to start the inversion with the results calculated above
 for the single observations.</p>
-<div class="highlight-python"><pre>help_ignore_derivative = "Set to True to override loading any defined derivative functions in the library and use numerical approximations instead"
-
-[operator.obs.x]
-names = $parameter.names[1:]
-sd = [1.0]*len($operator.obs.x.names)
+<div class="highlight-python"><pre>sd = [1.0]*len($operator.obs.x.names)
 datatype = x
 
 [operator.obs.y]
@@ -364,12 +361,16 @@ control = 'mask vza vaa sza saa'.split()
 names = ['433-453','457.5-522.5','542.5-577.5','650-680','697.5-712.5','732.5-747.5','773-793','784.5-899.5','855-875','935-955','1565-1655','2100-2280']
 sd = ["0.004", "0.00416142",  "0.00440183", "0.00476245", "0.00489983", "0.00502003","0.00516772", "0.00537035", "0.00544934", "0.0057241", "0.00800801","0.01" ]
 datatype = y
+state = 'data/rse1_test.100.dat'
+help_state='set the obs state file'
+
+[operator.obs.y.result]
 </pre>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
 <p class="last">Here we need to put the solution plots. However, it appears that
-we might need new <img class="math" src="_images/math/913e49ea63c6c130bb8d9d1c3556b052ecc404f8.png" alt="\Gamma"/> values?</p>
+we might need new <span class="math">\(\Gamma\)</span> values?</p>
 </div>
 <div class="figure">
 <img alt="_images/sentinel.png" src="_images/sentinel.png" style="width: 90%;" />

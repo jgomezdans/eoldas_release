@@ -26,6 +26,7 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
     <script type="text/javascript" src="_static/theme_extras.js"></script>
     <link rel="top" title="EOLDAS Users&#39; Guide 2012.06 documentation" href="index.html" />
     <link rel="next" title="Radiative transfer modelling for optical remote sensing" href="example2.html" />
@@ -175,7 +176,7 @@ see some examples later.</p>
 refer directly to python classes for the operators in EOLDAS. The base class is &#8216;Operator&#8217;
 which implements the Identity operator.  All other classes are derived from this.
 The differential operator works only on the x state vector, which is equlivalent to defining
-<img class="math" src="_images/math/b0f58030de0841ce02f2fbeea00dfdcbdcbd78bd.png" alt="\mathbf{y_{obs}}=0"/>. The operator &#8216;Operator&#8217; access both x and y data if it to
+<span class="math">\(\mathbf{y_{obs}}=0\)</span>. The operator &#8216;Operator&#8217; access both x and y data if it to
 act as a Prior constraint, so we set up x and y datatypes.</p>
 <p>Next we set the details of these operators. First, the differential operator:</p>
 <div class="highlight-python"><pre>[operator.modelt.x]
@@ -191,7 +192,7 @@ wraparound=periodic,365
 </div>
 <p>where we specify which state vector elements this operator has access to (all of those
 in parameter.names here) and set up the default uncertainty and datatype.</p>
-<p>We then set the parameters specific to the &#8216;model&#8217; <img class="math" src="_images/math/12cdaf71983dffcb469258bbb68113bcff3799a7.png" alt="H(\mathbf{x})"/>, in this case
+<p>We then set the parameters specific to the &#8216;model&#8217; <span class="math">\(H(\mathbf{x})\)</span>, in this case
 the order of the differential model (2 here) and the edge conditions (periodic, with
 a period of 200 (days)).</p>
 <p>Finally, we set up the operator <tt class="docutils literal"><span class="pre">operator.obs</span></tt>, specifically, parameters for its
@@ -287,7 +288,7 @@ parameter obs_off randomly removes a proportion of the data. If window_size and 
 then a savitzky_golay filter is used to induce correlation in the timing of the samples that
 are removed from thie dataset (qa=0). This mimics what we practically have in Optical Earth Observation
 with temporal correlation in cloud cover.</p>
-<p>The next section calculates the &#8216;ideal&#8217; value of <img class="math" src="_images/math/66981fa3920210c6ad8dbe5e968783d5dd7520c3.png" alt="\gamma"/> by calculating the root mean
+<p>The next section calculates the &#8216;ideal&#8217; value of <span class="math">\(\gamma\)</span> by calculating the root mean
 squared deviation of the original dataset. We use this ideal gamma here for to demonstrate the physical meaning
 of the gamma value, though in practice this would be unknown. This section also writes the dataset to a temporary file
 in &#8216;BRDF&#8217; format.</p>
@@ -403,6 +404,7 @@ Here, <tt class="docutils literal"><span class="pre">eoldas_config.conf</span></
 <span class="c"># These are the default values</span>
 <span class="n">iprint</span><span class="o">=</span><span class="mi">1</span>
 <span class="n">gtol</span><span class="o">=</span><span class="mf">1e-3</span>
+<span class="n">help_gtol</span> <span class="o">=</span> <span class="s">&#39;set the relative tolerance for termination&#39;</span>
 <span class="n">maxIter</span><span class="o">=</span><span class="mf">1e4</span>
 <span class="n">maxFunEvals</span><span class="o">=</span><span class="mf">2e4</span>
 <span class="n">plot</span><span class="o">=</span><span class="mi">0</span>
@@ -410,7 +412,6 @@ Here, <tt class="docutils literal"><span class="pre">eoldas_config.conf</span></
 <span class="n">solverfn</span><span class="o">=</span><span class="n">scipy_lbfgsb</span> 
 <span class="n">randomise</span><span class="o">=</span><span class="bp">False</span>
 <span class="n">help_randomise</span><span class="o">=</span><span class="s">&#39;Randomise the starting point&#39;</span>
-<span class="n">no_df</span> <span class="o">=</span> <span class="bp">False</span>
 </pre></div>
 </div>
 <p>To understand how e.g the flag <tt class="docutils literal"><span class="pre">--calc_posterior_unc</span></tt> can be used we can look at:</p>
@@ -439,14 +440,14 @@ datatype = y
 </div>
 <p>If we run <tt class="docutils literal"><span class="pre">solve_eoldas_identity.py</span></tt>, it sends logging information to <tt class="docutils literal"><span class="pre">mylogs/Identity.log</span></tt>
 and reports (to the stderr) the progress of the optimisation, &#8216;f&#8217; being
-the total of all of the <img class="math" src="_images/math/abb5588023cfa1ac14643e9778699f03eecc57a3.png" alt="J"/> terms for this configuration. It should
+the total of all of the <span class="math">\(J\)</span> terms for this configuration. It should
 converge to a solution within some tens of iterations and result in a final value of
-<img class="math" src="_images/math/abb5588023cfa1ac14643e9778699f03eecc57a3.png" alt="J"/> of around 1800. We set the name of the logfile in <tt class="docutils literal"><span class="pre">solve_eoldas_identity.py</span></tt>:</p>
+<span class="math">\(J\)</span> of around 1800. We set the name of the logfile in <tt class="docutils literal"><span class="pre">solve_eoldas_identity.py</span></tt>:</p>
 <div class="highlight-python"><div class="highlight"><pre>    <span class="k">if</span> <span class="n">window_size</span> <span class="o">&gt;</span><span class="mi">0</span><span class="p">:</span>
 </pre></div>
 </div>
 <p>There is a lot of detail in the log file about exactly what value terms are set to
-and the progress of the eoldas. It also contains information on the individual <img class="math" src="_images/math/abb5588023cfa1ac14643e9778699f03eecc57a3.png" alt="J"/>
+and the progress of the eoldas. It also contains information on the individual <span class="math">\(J\)</span>
 terms:</p>
 <div class="highlight-python"><pre>2012-06-14 15:15:57,455 - eoldas.solver.eoldas.solver-obs-x - INFO -      J   = 293.213607
 2012-06-14 15:15:57,456 - eoldas.solver.eoldas.solver-modelt-x - INFO -      J   = 34.354830
@@ -502,7 +503,7 @@ the results.</p>
 <p>so this goes to a file <tt class="docutils literal"><span class="pre">output/Identity/NDVI_fwd.params</span></tt> unless the flag
 <tt class="docutils literal"><span class="pre">--operator.obs.y.result.filename=somethingElse.dat</span></tt> is used.
 The format of this file is the same as above, but it shows the retrieved
-NDVI data since this reports <img class="math" src="_images/math/df4e0c1b626e2abd358c8aa60271a28778f866e6.png" alt="H(x)"/>.</p>
+NDVI data since this reports <span class="math">\(H(x)\)</span>.</p>
 <div class="highlight-python"><pre>#PARAMETERS time mask NDVI sd-NDVI
    1.000000    1.000000    0.211816    0.000000
    8.000000    1.000000    0.275085    0.000000
