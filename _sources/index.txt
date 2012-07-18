@@ -16,5 +16,6 @@ Contents:
    example1.rst
    example2.rst
    example_sentinel2.rst
+   example_field.rst
    example_spatial.rst
 

@@ -28,7 +28,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/theme_extras.js"></script>
     <link rel="top" title="EOLDAS Users&#39; Guide 2012.06 documentation" href="index.html" />
-    <link rel="next" title="Spatial and multi-scale data assimilation examples" href="example_spatial.html" />
+    <link rel="next" title="Inverting a time series of MODIS observations over agricultural fields" href="example_field.html" />
     <link rel="prev" title="Radiative transfer modelling for optical remote sensing" href="example2.html" /> 
   </head>
   <body>
@@ -44,7 +44,7 @@
         &#160;&#160;::&#160;&#160;
         <a class="uplink" href="index.html">Contents</a>
         &#160;&#160;::&#160;&#160;
-        <a href="example_spatial.html">Spatial and multi-scale data assimilation examples</a>&#160;&#160;»
+        <a href="example_field.html">Inverting a time series of MODIS observations over agricultural fields</a>&#160;&#160;»
         </p>
 
       </div>
@@ -193,15 +193,15 @@ to simulate the solar geometry.</p>
 <h2>Generating the synthetic observations<a class="headerlink" href="#generating-the-synthetic-observations" title="Permalink to this headline">¶</a></h2>
 <p>The code for this is fairly simple, and can be seen in the <tt class="docutils literal"><span class="pre">main</span></tt>
 function in <tt class="docutils literal"><span class="pre">sentinel.py</span></tt>:</p>
-<div class="highlight-python"><div class="highlight"><pre>  <span class="n">s</span> <span class="o">=</span> <span class="n">Sentinel</span><span class="p">()</span>
-  <span class="c"># generate parameter dataset</span>
-  <span class="n">s</span><span class="o">.</span><span class="n">parameters</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">366</span><span class="p">),</span><span class="s">&#39;input/truth.dat&#39;</span><span class="p">)</span>
-  <span class="c"># generate noise free observations (every 5 days)</span>
-  <span class="n">s</span><span class="o">.</span><span class="n">fwdModel</span><span class="p">(</span><span class="s">&#39;input/truth.dat&#39;</span><span class="p">,</span><span class="s">&#39;input/sentinelClean.dat&#39;</span><span class="p">,</span><span class="n">every</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-  <span class="n">s</span><span class="o">.</span><span class="n">fwdModel</span><span class="p">(</span><span class="s">&#39;input/truth.dat&#39;</span><span class="p">,</span><span class="s">&#39;input/sentinelGapClean.dat&#39;</span><span class="p">,</span><span class="n">every</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span><span class="n">prop</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span><span class="n">WINDOW</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
-  <span class="c"># add noise to the observations</span>
-  <span class="n">s</span><span class="o">.</span><span class="n">addNoiseToObservations</span><span class="p">(</span><span class="s">&#39;input/sentinelClean.dat&#39;</span><span class="p">,</span><span class="s">&#39;input/sentinel.dat&#39;</span><span class="p">,</span><span class="n">nMag</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
-  <span class="n">s</span><span class="o">.</span><span class="n">addNoiseToObservations</span><span class="p">(</span><span class="s">&#39;input/sentinelGapClean.dat&#39;</span><span class="p">,</span><span class="s">&#39;input/sentinelGap.dat&#39;</span><span class="p">,</span><span class="n">nMag</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+<div class="highlight-python"><div class="highlight"><pre><span class="n">xs1</span> <span class="o">=</span> <span class="mf">0.00</span><span class="p">,</span> <span class="mf">1.5</span>
+<span class="n">xs2</span> <span class="o">=</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span>
+<span class="n">xs3</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.05</span><span class="p">,</span><span class="mf">0.05</span>
+<span class="n">xs4</span> <span class="o">=</span> <span class="o">-</span><span class="mf">0.03</span><span class="p">,</span><span class="mf">0.03</span>
+<span class="n">lad</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span><span class="mi">5</span> 
+
+
+<span class="p">[</span><span class="n">general</span><span class="p">]</span>
+<span class="n">is_spectral</span> <span class="o">=</span> <span class="bp">True</span>
 </pre></div>
 </div>
 <p>We first instantiate the <tt class="docutils literal"><span class="pre">Sentinel</span></tt> class, calculate the parameter
@@ -277,49 +277,49 @@ account the noise.</p>
 <p>We test some of these ideas with the clean datasets
 (those that have had no noise added to them). We also plot the results
 using graphical methods <tt class="docutils literal"><span class="pre">Sentinel.crossPlot</span></tt> and <tt class="docutils literal"><span class="pre">Sentinel.paramPlot</span></tt>.</p>
-<div class="highlight-python"><div class="highlight"><pre>  <span class="c"># solve for parameter estimate, using one date at a time</span>
-  <span class="c"># e.g. test for clean data starting from the correct value</span>
-  <span class="c"># This should work perfectly &amp; go stright to the the solution</span>
-  <span class="c"># So, this is a sanity check for the solver mainly, but it is also</span>
-  <span class="c"># interesting to look at the distribution of uncertainties</span>
-  <span class="c"># in the plot plots/sentinelClean1_pplot.png</span>
-  <span class="c"># When we add noise, we expect the solution to lie somewhere in these bounds</span>
-  <span class="c"># generally.</span>
-  <span class="n">s</span><span class="o">.</span><span class="n">solveSingle</span><span class="p">(</span><span class="s">&#39;input/sentinelClean.dat&#39;</span><span class="p">,</span><span class="s">&#39;output/sentinelClean1.dat&#39;</span><span class="p">,</span><span class="n">initial</span><span class="o">=</span><span class="s">&#39;input/truth.dat&#39;</span><span class="p">)</span>
-  <span class="n">s</span><span class="o">.</span><span class="n">crossPlot</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;input/truth.dat&#39;</span><span class="p">),</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;output/sentinelClean1.dat&#39;</span><span class="p">),</span>\
-            <span class="n">params</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="s">&#39;plots/sentinelClean1_xplot.png&#39;</span><span class="p">)</span>
-  <span class="n">s</span><span class="o">.</span><span class="n">paramPlot</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;input/truth.dat&#39;</span><span class="p">),</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;output/sentinelClean1.dat&#39;</span><span class="p">),</span>\
-            <span class="n">params</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="s">&#39;plots/sentinelClean1_pplot.png&#39;</span><span class="p">)</span>
+<div class="highlight-python"><pre>help_calc_posterior_unc="Posterior uncertainty calculations"
+write_results=True
+doplot=True
+help_doplot='plotting'
+plotmod=30
+help_plotmod='frequency of plotting'
+plotmovie=False
+epsilon=10e-15
+help_epsilon="Epsilon"
 
-  <span class="c"># e.g. test for clean data not starting from the correct value</span>
-  <span class="c"># Ideally, this would provide the same result, but that is unlikely</span>
-  <span class="c"># as the cost function is quite flat around the minimum.</span>
-  <span class="c"># But actually it does a pretty good job other than perhaps the </span>
-  <span class="c"># first sample, which suggests that we need to reconsider</span>
-  <span class="c"># starting positions if we can afford it (e.g. go through the</span>
-  <span class="c"># series backwards as well) </span>
-  <span class="n">s</span><span class="o">.</span><span class="n">solveSingle</span><span class="p">(</span><span class="s">&#39;input/sentinelClean.dat&#39;</span><span class="p">,</span><span class="s">&#39;output/sentinelClean2.dat&#39;</span><span class="p">)</span>
-  <span class="n">s</span><span class="o">.</span><span class="n">crossPlot</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;input/truth.dat&#39;</span><span class="p">),</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;output/sentinelClean2.dat&#39;</span><span class="p">),</span>\
-            <span class="n">params</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="s">&#39;plots/sentinelClean2_xplot.png&#39;</span><span class="p">)</span>
-  <span class="n">s</span><span class="o">.</span><span class="n">paramPlot</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;input/truth.dat&#39;</span><span class="p">),</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;output/sentinelClean2.dat&#39;</span><span class="p">),</span>\
-            <span class="n">params</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="s">&#39;plots/sentinelClean2_pplot.png&#39;</span><span class="p">)</span>
+[general.optimisation]
+randomise=False
 
-  <span class="c"># e.g. test normal, i.e. data with noise. This is now a realistic test</span>
-  <span class="c"># of the solver for noisy data. We expect the result to be similar</span>
-  <span class="c"># to the truth (mostly within the 90% CI) </span>
-  <span class="c"># Again, this should do a pretty decent job</span>
-  <span class="n">s</span><span class="o">.</span><span class="n">solveSingle</span><span class="p">(</span><span class="s">&#39;input/sentinel.dat&#39;</span><span class="p">,</span><span class="s">&#39;output/sentinel.dat&#39;</span><span class="p">)</span>
-  <span class="n">s</span><span class="o">.</span><span class="n">crossPlot</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;input/truth.dat&#39;</span><span class="p">),</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;output/sentinel.dat&#39;</span><span class="p">),</span>\
-            <span class="n">params</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="s">&#39;plots/sentinel_xplot.png&#39;</span><span class="p">)</span>
-  <span class="n">s</span><span class="o">.</span><span class="n">paramPlot</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;input/truth.dat&#39;</span><span class="p">),</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;output/sentinel.dat&#39;</span><span class="p">),</span>\
-            <span class="n">params</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="s">&#39;plots/sentinel_pplot.png&#39;</span><span class="p">)</span>
+[operator]
+prior.name=Operator
+prior.datatypes = x,y
+obs.name=Observation_Operator
+obs.datatypes = x,y
 
-  <span class="n">s</span><span class="o">.</span><span class="n">solveSingle</span><span class="p">(</span><span class="s">&#39;input/sentinelGap.dat&#39;</span><span class="p">,</span><span class="s">&#39;output/sentinelGap.dat&#39;</span><span class="p">)</span>
-  <span class="n">s</span><span class="o">.</span><span class="n">crossPlot</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;input/truth.dat&#39;</span><span class="p">),</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;output/sentinelGap.dat&#39;</span><span class="p">),</span>\
-            <span class="n">params</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="s">&#39;plots/sentinelGap_xplot.png&#39;</span><span class="p">)</span>
-  <span class="n">s</span><span class="o">.</span><span class="n">paramPlot</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;input/truth.dat&#39;</span><span class="p">),</span><span class="n">s</span><span class="o">.</span><span class="n">loadData</span><span class="p">(</span><span class="s">&#39;output/sentinelGap.dat&#39;</span><span class="p">),</span>\
-            <span class="n">params</span><span class="p">,</span><span class="n">filename</span><span class="o">=</span><span class="s">&#39;plots/sentinelGap_pplot.png&#39;</span><span class="p">)</span>
-</pre></div>
+[operator.prior.x]
+names = $parameter.names[1:]
+datatype = x
+
+[operator.prior.y]
+control = 'mask'.split()
+names = $parameter.names[1:]
+sd = [10.0]*len($operator.prior.y.names)
+help_sd='set the prior sd'
+datatype = y
+state = $parameter.x.default[1:]
+help_state = "Set the prior state vector"
+
+[operator.prior.y.result]
+filename='output/rse1/rse1_test_prior.dat'
+help_filename = 'prior filename'
+
+[operator.obs.rt_model]
+model=semidiscrete1
+use_median=True
+help_use_median = "Flag to state whether full bandpass function should be used or not. If True, then the median wavelength of the bandpass function is used"
+bounds = [400,2500,1]
+help_bounds = "The spectral bounds (min,max,step) for the operator'
+</pre>
 </div>
 <div class="figure">
 <img alt="_images/sentinelClean1.png" src="_images/sentinelClean1.png" style="width: 90%;" />
@@ -352,19 +352,19 @@ Right panel: scatterplot of retrieved parameters vs true parameters.</p>
 using the <tt class="docutils literal"><span class="pre">Sentinel.solveRegular</span></tt> method. One way to speed up
 processing is to start the inversion with the results calculated above
 for the single observations.</p>
-<div class="highlight-python"><div class="highlight"><pre>  <span class="c"># now, taking the result of the single inversion as the inital estimate (at the data points)</span>
-  <span class="c"># try to solve for all time samples using regularisation</span>
-  <span class="c"># If this takes some time, watch the world go by in the grpahs such as</span>
-  <span class="c"># in output/sentinel_O_1_gamma_100_resul*.png</span>
-  <span class="n">s</span><span class="o">.</span><span class="n">solveRegular</span><span class="p">(</span><span class="s">&#39;input/sentinel.dat&#39;</span><span class="p">,</span><span class="s">&#39;output/sentinel_O_1_gamma_150.dat&#39;</span><span class="p">,</span>\
-            <span class="n">modelOrder</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">gamma</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span><span class="n">initial</span><span class="o">=</span><span class="s">&#39;output/sentinel.dat&#39;</span><span class="p">)</span>
-  <span class="n">s</span><span class="o">.</span><span class="n">solveRegular</span><span class="p">(</span><span class="s">&#39;input/sentinelGap.dat&#39;</span><span class="p">,</span><span class="s">&#39;output/sentinelGap_O_1_gamma_150.dat&#39;</span><span class="p">,</span>\
-            <span class="n">modelOrder</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">gamma</span><span class="o">=</span><span class="mi">150</span><span class="p">,</span><span class="n">initial</span><span class="o">=</span><span class="s">&#39;output/sentinelGap.dat&#39;</span><span class="p">)</span>
-  <span class="n">s</span><span class="o">.</span><span class="n">solveRegular</span><span class="p">(</span><span class="s">&#39;input/sentinel.dat&#39;</span><span class="p">,</span><span class="s">&#39;output/sentinel_O_2_gamma_530.dat&#39;</span><span class="p">,</span>\
-            <span class="n">modelOrder</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">gamma</span><span class="o">=</span><span class="mi">530</span><span class="p">,</span><span class="n">initial</span><span class="o">=</span><span class="s">&#39;output/sentinel.dat&#39;</span><span class="p">)</span>
-  <span class="n">s</span><span class="o">.</span><span class="n">solveRegular</span><span class="p">(</span><span class="s">&#39;input/sentinelGap.dat&#39;</span><span class="p">,</span><span class="s">&#39;output/sentinelGap_O_2_gamma_530.dat&#39;</span><span class="p">,</span>\
-            <span class="n">modelOrder</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="n">gamma</span><span class="o">=</span><span class="mi">530</span><span class="p">,</span><span class="n">initial</span><span class="o">=</span><span class="s">&#39;output/sentinelGap.dat&#39;</span><span class="p">)</span>
-</pre></div>
+<div class="highlight-python"><pre>help_ignore_derivative = "Set to True to override loading any defined derivative functions in the library and use numerical approximations instead"
+
+[operator.obs.x]
+names = $parameter.names[1:]
+sd = [1.0]*len($operator.obs.x.names)
+datatype = x
+
+[operator.obs.y]
+control = 'mask vza vaa sza saa'.split()
+names = ['433-453','457.5-522.5','542.5-577.5','650-680','697.5-712.5','732.5-747.5','773-793','784.5-899.5','855-875','935-955','1565-1655','2100-2280']
+sd = ["0.004", "0.00416142",  "0.00440183", "0.00476245", "0.00489983", "0.00502003","0.00516772", "0.00537035", "0.00544934", "0.0057241", "0.00800801","0.01" ]
+datatype = y
+</pre>
 </div>
 <div class="admonition note">
 <p class="first admonition-title">Note</p>
@@ -395,7 +395,7 @@ Right panel: scatterplot of retrieved parameters vs true parameters.</p>
         &#160;&#160;::&#160;&#160;
         <a class="uplink" href="index.html">Contents</a>
         &#160;&#160;::&#160;&#160;
-        <a href="example_spatial.html">Spatial and multi-scale data assimilation examples</a>&#160;&#160;»
+        <a href="example_field.html">Inverting a time series of MODIS observations over agricultural fields</a>&#160;&#160;»
         </p>
 
       </div>
