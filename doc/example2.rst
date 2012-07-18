@@ -409,23 +409,6 @@ for this (sd) is 0.018995 on ``xlai``, so the ``xlai`` confidence interval is
 probably unreliable: we can suggest that because the optimisation 
 routine reported that  it did not find a very well converged solution. 
 
-A Coding note and caveat
-------------------------
-
-.. warning::
-
-   This needs updating!
-   
-Note that in the configuration file we have specified the operator.obs_modis.rt_model.model field as rtmodel_ad_trans1, rather than rtmodel_ad_trans2. 
-
-In reality, these are the same models, but because they are FORTRAN shared object libraries containing the semidiscrete model
-and because they make use of global variables, one cannot run more than one observation operator that call the same shared object.
-To get around this problem, we have essentially made multiple copies of the library, so that different observation operators
-(e.g. using data from different sensors) can each have their own version. New operators in the future should be written with more
-careful consideration of such issues. Similar coding issues also make it next to impossible to run
-multi-core paralellisation optimisations to speed up code execution. The lesson is ... avoid globals like the plague, but there 
-is normally some way we can get around the problem. In this case, the implication is that only 8 different observation operators
-calling the semidiscrete code can be run in one data assimilation exercise, as we have only generate 8 copies of the library.
 
 Other forms of constraint
 -------------------------
