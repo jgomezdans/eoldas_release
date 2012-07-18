@@ -72,6 +72,8 @@ different variational DA schemes (although we mostly have used weak constraints)
 </div>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="requirements">
+<h3>Requirements<a class="headerlink" href="#requirements" title="Permalink to this headline">¶</a></h3>
 <p>EOLDAS has mostly been written in Python, with some radiative transfer
 codes written in Fortran and made available to the main Python library.
 The requirements for the package are</p>
@@ -103,6 +105,9 @@ for your user as</p>
 <p>or</p>
 <div class="highlight-python"><pre>pip install --user openopt</pre>
 </div>
+</div>
+<div class="section" id="id1">
+<h3>Installation<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <p>The eoldas distribution can be installed using the same approach as
 OpenOpt:</p>
 <div class="highlight-python"><pre>easy_install --user -U eoldas</pre>
@@ -116,24 +121,40 @@ the installation executables path will be installation dependent. Note
 that this command will also install the semidiscrete radiative transfer
 code and compile it (many warning will show up, but they are safe to
 ignore).</p>
+</div>
+<div class="section" id="installing-from-source">
+<h3>Installing from source<a class="headerlink" href="#installing-from-source" title="Permalink to this headline">¶</a></h3>
 <p>If you plan to do development on EOLDAS, we strongly encourage you to
 <a class="reference external" href="https://help.github.com/articles/fork-a-repo">fork</a> the <a class="reference external" href="https://github.com/jgomezdans/eoldas">EOLDAS repository</a>
-on github, and feel free to submit patches, suggestions, etc.</p>
+on github, and feel free to submit patches, suggestions, etc. You can
+also download a snapshot of the code from github. Once you have
+unpacked the tarball, you can install it using the following command</p>
+<div class="highlight-python"><pre>python setup.py install</pre>
+</div>
+<p>(as before, if you don&#8217;t have super user priviledges, add the <tt class="docutils literal"><span class="pre">--user</span></tt>
+flag to the previous command).</p>
 </div>
 <div class="section" id="installing-the-user-s-guide">
-<h2>Installing the user&#8217;s guide<a class="headerlink" href="#installing-the-user-s-guide" title="Permalink to this headline">¶</a></h2>
+<h3>Installing the user&#8217;s guide<a class="headerlink" href="#installing-the-user-s-guide" title="Permalink to this headline">¶</a></h3>
 <p>The user&#8217;s guide is available on  <a class="reference external" href="http://github.com/jgomezdans/eoldas_release/">github.com</a>.
 Although you can just download an archive with the examples, data and
 source of this guide, we encourage you to <a class="reference external" href="https://help.github.com/articles/fork-a-repo">fork</a>
 the <a class="reference external" href="http://github.com/jgomezdans/eoldas_release/">eoldas_release git repository</a>,
 and to work on it and submit bug reports, fixes etc.</p>
 </div>
-<div class="section" id="the-eoldas-community">
-<h2>The EOLDAS community<a class="headerlink" href="#the-eoldas-community" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="getting-help-collaborating-on-improving-eoldas">
+<h3>Getting help &amp; Collaborating on improving EOLDAS<a class="headerlink" href="#getting-help-collaborating-on-improving-eoldas" title="Permalink to this headline">¶</a></h3>
 <p>EOLDAS is a complex and varied tool that can help solve many problems
 where Gaussian statistics are a good assumption in variational problems.
 We would like users to use github as a way to collaborate in fixing bugs,
 spreading what you can do with EOLDAS, and to put together tutorials.</p>
+<p>There are two main ways for collaboration in either the user&#8217;s guide or
+the main EOLDAS package: one is to make <a class="reference external" href="https://help.github.com/articles/using-pull-requests/">a pull request</a>
+after you have forked the relevant repository (<tt class="docutils literal"><span class="pre">eoldas</span></tt> or
+<tt class="docutils literal"><span class="pre">eoldas_release</span></tt>). A second avenue is to  use the Wiki. The user&#8217;s
+guide has <a class="reference external" href="https://github.com/jgomezdans/eoldas_release/wiki">Wiki page</a>,
+and so does the <a class="reference external" href="https://github.com/jgomezdans/eoldas/wiki">main eoldas repostiory</a>.</p>
+</div>
 </div>
 </div>
 

@@ -8,6 +8,32 @@ Welcome to EOLDAS user guide's documentation!
 
 Contents:
 
+The EOLDAS project is funded by ESA as part of the Support to Science Element (STSE) of the Earth observation Envelope Programme.
+    
+The aims of the projects are:
+        
+* To develop and document a generic data assimilation scheme to assist the retrieval of geophysical parameters from medium resolution optical EO data
+* To develop a prototype software package implementing selected aspects of the scheme
+* To validate the prototype using multi-sensor EO data and field measurements
+
+The project is led by the UK National Centre for Earth Observation (NCEO) with a team that includes:
+            
+            The University of Reading
+            
+            University College London
+            
+            Swansea University
+            
+            The Joint Research Center
+            
+            FSU Jena
+            
+            FastOpt GMbH
+            
+            Scisys Ltd
+            
+
+
 .. toctree::
    :maxdepth: 3
    
