@@ -11,7 +11,7 @@ the full cost function, and then calculate the Hessian, etc.
 """
 import numpy as np
 import matplotlib.pyplot as plt
-from sentinel import Sentinel, gcv
+from sentinel import Sentinel
 
 
 def main (ifile = 'data/brdf_WW_1_A_1.kernelFiltered.dat', \
