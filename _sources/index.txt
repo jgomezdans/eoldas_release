@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome EOLDAS user guide's documentation!
+EOLDAS user guide's documentation!
 =============================================
 
 .. note:: 
@@ -11,7 +11,7 @@ Welcome EOLDAS user guide's documentation!
       
 
 Introduction
------------------------
+"""""""""""""""""""""
 
 The `EOLDAS project <http://www.eoldas.info/>`_ is funded by ESA as part of the `Support to Science Element (STSE) <http://due.esrin.esa.int/stse/>`_ 
 of the Earth observation Envelope Programme.
@@ -34,7 +34,7 @@ The project is led by the UK `National Centre for Earth Observation (NCEO) <http
             
 
 Contents
--------------
+"""""""""""""
 
 .. toctree::
    :maxdepth: 3

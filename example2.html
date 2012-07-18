@@ -640,22 +640,6 @@ for this (sd) is 0.018995 on <tt class="docutils literal"><span class="pre">xlai
 0.0 to 6.25, since it is bounded at 0. These posterior estimates are
 probably unreliable: we can suggest that because the optimisation
 routine reported that  it did not find a very well converged solution.</p>
-<div class="section" id="a-coding-note-and-caveat">
-<h3>A Coding note and caveat<a class="headerlink" href="#a-coding-note-and-caveat" title="Permalink to this headline">¶</a></h3>
-<div class="admonition warning">
-<p class="first admonition-title">Warning</p>
-<p class="last">This needs updating!</p>
-</div>
-<p>Note that in the configuration file we have specified the operator.obs_modis.rt_model.model field as rtmodel_ad_trans1, rather than rtmodel_ad_trans2.</p>
-<p>In reality, these are the same models, but because they are FORTRAN shared object libraries containing the semidiscrete model
-and because they make use of global variables, one cannot run more than one observation operator that call the same shared object.
-To get around this problem, we have essentially made multiple copies of the library, so that different observation operators
-(e.g. using data from different sensors) can each have their own version. New operators in the future should be written with more
-careful consideration of such issues. Similar coding issues also make it next to impossible to run
-multi-core paralellisation optimisations to speed up code execution. The lesson is ... avoid globals like the plague, but there
-is normally some way we can get around the problem. In this case, the implication is that only 8 different observation operators
-calling the semidiscrete code can be run in one data assimilation exercise, as we have only generate 8 copies of the library.</p>
-</div>
 <div class="section" id="other-forms-of-constraint">
 <h3>Other forms of constraint<a class="headerlink" href="#other-forms-of-constraint" title="Permalink to this headline">¶</a></h3>
 <p>We have seen that we can apply eoldas to state vector estimation using the semidiscrete canopy reflectance model. This is
