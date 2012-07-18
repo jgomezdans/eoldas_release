@@ -1046,34 +1046,6 @@ def main(gen=True,solve=True):
               filename='plots/%s_O_%d_gamma_%d.png'%(f,o,g))
 
 
-def testFieldData():
-  '''
-  Show that we can use this same setup to solve 
-  for the field data (MODIS) by using a different config file
-  '''
-  solve = ['xlai','xkab','scen','xkw','xkm','xleafn','xs1']
-  confFile='config_files/semid_default.conf'
-  ifile = 'data/brdf_WW_1_A_1.kernelFiltered.dat'
-  ofileSingle = 'output/brdf_WW_1_A_1.kernelFilteredSingle.dat'
-  ofile = 'output/brdf_WW_1_A_1.kernelFiltered.dat'
-
-  s = Sentinel(solve=solve,confFile=confFile)
-  # as above, solve for initial estimate
-  s.solveSingle(ifile,ofileSingle)
-  s.paramPlot(s.loadData(ofileSingle),s.loadData(ofileSingle),\
-                 filename='plots/testFieldDataSingle.png')
-  s.smooth(ofileSingle,ofile=ofileSingle+'_smooth')
-  s.paramPlot(s.loadData('input/truth.dat'),\
-              s.loadData(ofileSingle+'_smooth'),\
-              filename='plots/%s.png'%(ofileSingle+'_smooth'))
-
-  gamma = np.median(np.sqrt(s.gammaSolve.values()) * np.array(s.wScale.values()))
-  gamma = int((np.sqrt(s.gammaSolve[solve[0]]) * np.array(s.wScale[solve[0]]))+0.5)
-  s.solveRegular(ifile,ofile,modelOrder=2,gamma=gamma,initial=ofileSingle+'_smooth')
-  s.paramPlot(s.loadData(ofileSingle+'_smooth'),\
-              s.loadData(ofile + '_result.dat'),\
-              filename='plots/%s_Gamma%08d.png'%(ofile,gamma))
-
 def gcv(gamma_,y,weight,eigenvalues2,n,nMiss,y_hat_final):
   # a GCV function for the smoother
   from scipy.fftpack.realtransforms import dct,idct
