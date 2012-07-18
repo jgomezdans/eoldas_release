@@ -38,7 +38,7 @@ called ``main``:
 
 .. literalinclude: ../modis_inversions.py
    :language: python
-   :function: main   
+   :pyobject: main   
 
 
 Some comments
