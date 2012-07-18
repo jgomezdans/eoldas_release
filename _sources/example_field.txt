@@ -35,11 +35,12 @@ The script is quite simple, and uses the ``Sentinel`` class from the
 Sentinel synthetic experiment. The code is stored in a function 
 called ``main``:
 
-.. literalinclude: ../modis_inversions.py
+
+.. literalinclude:: ../modis_inversions.py
    :language: python
    :pyobject: main   
 
-We can see
+We can see  
 
 Some comments
 ^^^^^^^^^^^^^^^
