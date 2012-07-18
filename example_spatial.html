@@ -88,18 +88,15 @@ factor of 5 (so we should generally be under-smoothing).</p>
 <p>The EO-LDAS tool is accessed in this example through (i) a configuration file; (ii) a
 command-line to override some of the settings in a generic configuration file. The
 command line is set as:</p>
-<p>[CODE]</p>
+<img alt="_images/config1_screeny.png" src="_images/config1_screeny.png" />
 <p>and the (generic) configuration file given in (<a class="reference external" href="https://github.com/jgomezdans/eoldas_examples/blob/master/config_files/Identity.conf">www3</a>. In the configuration file, we
 declare the ‘location’ specification to be ‘time’ and specify the parameters we wish to
 solve for (NDVI here).</p>
-<p>[CODE]</p>
+<img alt="_images/config2_screeny.png" src="_images/config2_screeny.png" />
 <p>and set up the differential operator (in time):</p>
-<blockquote>
-<div>[CODE]</div></blockquote>
-<dl class="docutils">
-<dt>and the (Identity) observation operator:</dt>
-<dd>[CODE]</dd>
-</dl>
+<img alt="_images/config3_screeny.png" src="_images/config3_screeny.png" />
+<p>and the (Identity) observation operator:</p>
+<img alt="_images/config4_screeny.png" src="_images/config4_screeny.png" />
 <p>In further examples in the tutorial and in Lewis et al. (2012a,b) we go on to show how
 more complex observation operators (such as a radiative transfer model) can be used
 in the DA so that vegetation state variables (LAI etc.) can be estimated from remote
@@ -138,11 +135,9 @@ The input dataset then is shown in figure 3.</p>
 <p>We can again suppose the ‘holes’ in the observations to be representative of clouds.
 The configuration file for this experiment is given in <cite>www6 &lt;https://github.com/jgomezdans/eoldas_examples/blob/master/config_files/IdentitySpatial.conf&gt;</cite>.
 In setting up a spatial DA in EO-LDAS, we declare the location to be ‘row’ and ‘col’:</p>
-<blockquote>
-<div>[CODE]</div></blockquote>
+<img alt="_images/config5_screeny.png" src="_images/config5_screeny.png" />
 <p>We then define two differential operators, one in row and the other in column space:</p>
-<blockquote>
-<div>[CODE]</div></blockquote>
+<img alt="_images/config6_screeny.png" src="_images/config6_screeny.png" />
 <p>The observation operator is as in the previous example.
 The result of running the DA is an estimate of the NDVI for all sample locations:</p>
 <div class="figure">

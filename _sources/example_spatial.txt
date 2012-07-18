@@ -45,20 +45,22 @@ The EO-LDAS tool is accessed in this example through (i) a configuration file; (
 command-line to override some of the settings in a generic configuration file. The 
 command line is set as:                                                     
 
-[CODE]
+.. image:: config1_screeny.png
+
 
 and the (generic) configuration file given in (`www3 <https://github.com/jgomezdans/eoldas_examples/blob/master/config_files/Identity.conf>`_. In the configuration file, we 
 declare the ‘location’ specification to be ‘time’ and specify the parameters we wish to 
 solve for (NDVI here).
 
-[CODE]
+.. image:: config2_screeny.png
 
 and set up the differential operator (in time):
     
-        [CODE]
+.. image:: config3_screeny.png
         
 and the (Identity) observation operator:
-    [CODE]
+
+.. image:: config4_screeny.png
     
 In further examples in the tutorial and in Lewis et al. (2012a,b) we go on to show how 
 more complex observation operators (such as a radiative transfer model) can be used 
@@ -105,12 +107,12 @@ We can again suppose the ‘holes’ in the observations to be representative of
 The configuration file for this experiment is given in `www6 <https://github.com/jgomezdans/eoldas_examples/blob/master/config_files/IdentitySpatial.conf>`.
 In setting up a spatial DA in EO-LDAS, we declare the location to be ‘row’ and ‘col’:
     
-    [CODE]
+.. image:: config5_screeny.png
     
 We then define two differential operators, one in row and the other in column space:
     
         
-            [CODE]
+.. image:: config6_screeny.png
     
 The observation operator is as in the previous example.
 The result of running the DA is an estimate of the NDVI for all sample locations:
@@ -209,7 +211,8 @@ There is no apparent bias in the results (visually, from figure 10f). The transe
 figure 11 shows that though the reconstruction is still perhaps a little noisy (it could
 most likely tolerate a higher gamma) it provides a faithful reconstruction of the
 original data from noisy multi-resolution datasets with large gaps.
-     
+    
+ 
 .. figure:: NDVI_multires_panel2.png
         
     Fig. 10: Results of multi-scale analysis for 2/3 data missing
