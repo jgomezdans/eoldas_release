@@ -1,9 +1,6 @@
 ***************************************************************************
 Introduction
 ***************************************************************************
-.. note:: 
-   A PDF version of this document is available 
-   `here <http://jgomezdans.github.com/eoldas_release/EOLDAS_UsersGuide.pdf>`_
 
 This webiste contains a **live** version of the EOLDAS documentation. 
 EOLDAS stands for Earth Observation Land Data Assimilation System, and 
