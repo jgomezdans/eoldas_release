@@ -43,8 +43,10 @@ extensions = [
         #'matplotlib.sphinxext.only_directives',
         'sphinx.ext.mathjax',
         'sphinx.ext.intersphinx',
+	'sphinxcontrib.googleanalytics',
         'sphinx.ext.extlinks',
 ]
+googleanalytics_id="UA-25702318-1"
 
 #jsmath_path="_static/jsMath/easy/load.js"
 # Add any paths that contain templates here, relative to this directory.
