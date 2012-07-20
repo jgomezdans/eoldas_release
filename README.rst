@@ -9,7 +9,7 @@ Installation
 =============
 
 This repository holds the code and ancillary files that are required to run the
-examples in the `EOLDAS user's guide <http://jgomezdans.github.com/eoldas_relase/`_. 
+examples in the `EOLDAS user's guide <http://jgomezdans.github.com/eoldas_relase/>`_. 
 Please visit that website to find out more about EOLDAS!
 
 However, we first need to install EOLDAS and any other modules that are required
