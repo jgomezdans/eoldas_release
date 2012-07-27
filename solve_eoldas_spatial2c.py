@@ -155,7 +155,7 @@ if __name__ == "__main__":
 
     # initialise optuions for DA overriding any in config files
     cmd = 'eoldas ' +  \
-                ' --conf=eoldas_config.conf --conf=confs/IdentitySpatial2a.conf ' + \
+                ' --conf=config_files/eoldas_config.conf --conf=config_files/IdentitySpatial2a.conf ' + \
                 ' --logfile=mylogs/IdentitySpatial.log ' + \
                 ' --calc_posterior_unc ' + \
                 ' --parameter.solve=0,0,1 ' + \
