@@ -9,7 +9,8 @@ Installation
 =============
 
 This repository holds the code and ancillary files that are required to run the
-examples in the `EOLDAS user's guide <http://www2.geog.ucl.ac.uk/~plewis/eoldas/index.html>`_. 
+examples in the `EOLDAS user's guide <http://jgomezdans.github.com/eoldas_release/>`_. 
+Please visit that website to find out more about EOLDAS!
 
 However, we first need to install EOLDAS and any other modules that are required
 (in this case, RT codes that are distributed as independent packages). This is
