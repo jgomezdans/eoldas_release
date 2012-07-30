@@ -43,9 +43,16 @@ You can contact the authors:
 News
 =============================================
 
+July 30, 2012:
+    J Gómez-Dans gave a seminar at `VU Amsterdam <http://www.falw.vu.nl/nl/onderzoek/earth-sciences/geo-environmental-science-and-hydrology/index.asp>`_. 
+    Here's a link to the `talk <http://jgomezdans.github.com/eoldas_release/EOLDAS_VUA.pdf>`_
+
 July 18, 2012:
     First official release of the EOLDAS code and documentation.
     
+April 2012:
+    EOLDAS was at the `S2 preparatory symposium <http://www.s2symposium.org/>`_!
+            There's a presentation [`PPTX <http://jgomezdans.github.com/eoldas_release/Data_Assimilation_of_sentinel2_observations_preliminary_results_from_eoldas__Lewis_2012.pptx`_] and an associated paper [`PDF <http://jgomezdans.github.com/eoldas_release/Data_Assimilation_of_sentinel2_observations_preliminary_results_from_eoldas__Lewis_2012.pdf`_]
             
 Contents
 =============================================
