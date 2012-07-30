@@ -52,7 +52,7 @@ July 18, 2012:
     
 April 2012:
     EOLDAS was at the `S2 preparatory symposium <http://www.s2symposium.org/>`_!
-            There's a presentation [`PPTX <http://jgomezdans.github.com/eoldas_release/Data_Assimilation_of_sentinel2_observations_preliminary_results_from_eoldas__Lewis_2012.pptx`_] and an associated paper [`PDF <http://jgomezdans.github.com/eoldas_release/Data_Assimilation_of_sentinel2_observations_preliminary_results_from_eoldas__Lewis_2012.pdf`_]
+            There's a presentation [`PPTX <http://jgomezdans.github.com/eoldas_release/Data_Assimilation_of_sentinel2_observations_preliminary_results_from_eoldas__Lewis_2012.pptx>`_] and an associated paper [`PDF <http://jgomezdans.github.com/eoldas_release/Data_Assimilation_of_sentinel2_observations_preliminary_results_from_eoldas__Lewis_2012.pdf>`_]
             
 Contents
 =============================================
